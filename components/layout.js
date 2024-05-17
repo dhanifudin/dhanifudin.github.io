@@ -3,9 +3,11 @@ import Image from "next/image";
 import styles from "./layout.module.css";
 import utilStyles from "../styles/utils.module.css";
 import Link from "next/link";
+import Nav from "./nav";
+import NavItem from "./navitem";
 
 const name = "Dian Hanifudin Subhi";
-export const siteTitle = "Next.js Sample Website";
+export const siteTitle = "/home/dhanifudin";
 
 export default function Layout({ children, home }) {
   return (
@@ -37,6 +39,15 @@ export default function Layout({ children, home }) {
               alt={name}
             />
             <h1 className={utilStyles.heading2Xl}>{name}</h1>
+            {/* <Navbar></Navbar> */}
+            <div className="divide-y divide-slate-100">
+              <Nav>
+                <NavItem href="#">~/</NavItem>
+                <NavItem href="#">~/posts</NavItem>
+                <NavItem href="#">~/projects</NavItem>
+                <NavItem href="#">~/me</NavItem>
+              </Nav>
+            </div>
           </>
         ) : (
           <>
