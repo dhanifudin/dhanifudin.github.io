@@ -1,0 +1,54 @@
+name: Content Request
+description: Suggest a new blog post, project to add, or section to write
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! Detailed requests produce better results from the AI.
+
+        **Workflow:**
+        1. Fill out this form and submit
+        2. A collaborator comments `/plan` → OpenCode reads the discussion and posts an implementation plan
+        3. Review the plan; refine with comments if needed
+        4. Collaborator comments `/build` → OpenCode implements it and opens a PR
+        5. Merge after review
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Content type
+      options:
+        - Blog post
+        - Project entry
+        - About page update
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Suggested title
+      placeholder: "e.g. Using Nix to manage my dotfiles"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What should it cover?
+      description: Describe the content you'd like to see. The more specific, the better.
+      placeholder: |
+        A post about using Nix home-manager to manage dotfiles across machines.
+        Should cover: why Nix, basic setup, flakes, managing Neovim config...
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References / links (optional)
+      description: Any links, repos, or articles that should be referenced or linked.
+    validations:
+      required: false

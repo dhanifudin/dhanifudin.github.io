@@ -1,0 +1,196 @@
+---
+/**
+ * EditorLayout.astro — Neovim/LazyVim editor chrome
+ *
+ * Grid layout:
+ *   ┌────────────────────────────┐
+ *   │ BufferLine (tab strip)     │
+ *   ├──────────┬─────────────────┤
+ *   │ NeoTree  │  <slot/>        │
+ *   ├──────────┴─────────────────┤
+ *   │ StatusLine (lualine)       │
+ *   └────────────────────────────┘
+ *   + WhichKey overlay
+ *   + CommandPalette overlay
+ *   + KeyboardController (renderless)
+ */
+import { getCollection } from 'astro:content';
+import { pages, profile } from '../data/site';
+import '../styles/global.css';
+import KeyboardController from '../components/nvim/KeyboardController.vue';
+import NeoTree           from '../components/nvim/NeoTree.vue';
+import BufferLine        from '../components/nvim/BufferLine.vue';
+import StatusLine        from '../components/nvim/StatusLine.vue';
+import WhichKey          from '../components/nvim/WhichKey.vue';
+import CommandPalette    from '../components/nvim/CommandPalette.vue';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const currentPath = Astro.url.pathname;
+const pageTitle   = title ? `${title} — ${profile.handle}` : profile.handle;
+
+// Fetch collections for tree + palette
+const allPosts    = await getCollection('blog', ({ data }) => !data.draft).catch(() => []);
+const allProjects = await getCollection('projects').catch(() => []);
+
+const blogMeta = allPosts
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .map(p => ({
+    id:    p.id,
+    title: p.data.title,
+    path:  `/blog/${p.id}`,
+    date:  p.data.date.toISOString().split('T')[0],
+    tags:  p.data.tags,
+  }));
+
+const projectMeta = allProjects
+  .sort((a, b) => a.data.order - b.data.order)
+  .map(p => ({
+    id:    p.id,
+    title: p.data.title,
+    path:  `/projects/${p.id}`,
+    tags:  p.data.tags,
+  }));
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="latte">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{pageTitle}</title>
+  {description && <meta name="description" content={description} />}
+
+  <!-- No-FOUC: apply stored theme before paint -->
+  <script is:inline>
+    try {
+      const saved = localStorage.getItem('flavor');
+      if (saved === 'mocha') {
+        document.documentElement.setAttribute('data-theme', 'mocha');
+      }
+    } catch(e) {}
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+
+<body
+  style="
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--ctp-base);
+    color: var(--ctp-text);
+    font-family: var(--font-mono);
+  "
+>
+  <!-- ── Renderless keyboard controller ─────────────────────────────────── -->
+  <KeyboardController client:only="vue" />
+
+  <!-- ── Overlays ───────────────────────────────────────────────────────── -->
+  <WhichKey client:only="vue" />
+  <CommandPalette
+    client:only="vue"
+    pages={pages}
+    blogPosts={blogMeta}
+    projects={projectMeta}
+  />
+
+  <!-- ── BufferLine (tab strip) ─────────────────────────────────────────── -->
+  <BufferLine
+    client:only="vue"
+    currentPath={currentPath}
+    pages={pages}
+  />
+
+  <!-- ── Main area: NeoTree + Editor pane ───────────────────────────────── -->
+  <div
+    style="
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    "
+  >
+    <!-- NeoTree sidebar -->
+    <NeoTree
+      client:only="vue"
+      currentPath={currentPath}
+      pages={pages}
+      blogPosts={blogMeta}
+      projects={projectMeta}
+    />
+
+    <!-- Editor pane -->
+    <main
+      id="editor-pane"
+      style="
+        flex: 1;
+        min-width: 0;
+        overflow-y: auto;
+        background: var(--ctp-base);
+        padding: 1.25rem 1.5rem;
+        position: relative;
+      "
+    >
+      <!-- Mobile top bar (shown only on small screens) -->
+      <div
+        class="mobile-bar"
+        style="
+          display: none;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--ctp-surface0);
+        "
+      >
+        <span style="color: var(--ctp-mauve); font-weight: 600; font-size: 13px;">
+          {profile.handle}
+        </span>
+        <nav style="display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap;">
+          {pages.map(p => (
+            <a
+              href={p.path}
+              style={`
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                text-decoration: none;
+                color: ${currentPath === p.path || currentPath.startsWith(p.path + '/') ? 'var(--ctp-blue)' : 'var(--ctp-subtext1)'};
+                background: ${currentPath === p.path || currentPath.startsWith(p.path + '/') ? 'var(--ctp-surface0)' : 'transparent'};
+              `}
+            >
+              {p.icon} {p.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      <slot />
+    </main>
+  </div>
+
+  <!-- ── StatusLine ─────────────────────────────────────────────────────── -->
+  <StatusLine
+    client:only="vue"
+    currentPath={currentPath}
+    pages={pages}
+  />
+</body>
+</html>
+
+<style is:global>
+  /* Mobile: show mobile bar, hide neotree */
+  @media (max-width: 768px) {
+    .mobile-bar {
+      display: flex !important;
+    }
+  }
+</style>

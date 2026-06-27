@@ -1,11 +1,18 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import EditorLayout from '../layouts/EditorLayout.astro';
+import Dashboard from '../components/nvim/Dashboard.vue';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const allPosts    = await getCollection('blog', ({ data }) => !data.draft).catch(() => []);
+const allProjects = await getCollection('projects').catch(() => []);
+const buildDate   = new Date().toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<EditorLayout title="Dashboard" description="Dian Hanifudin Subhi — Software Engineer personal site">
+  <Dashboard
+    client:only="vue"
+    buildDate={buildDate}
+    postCount={allPosts.length}
+    projectCount={allProjects.length}
+  />
+</EditorLayout>

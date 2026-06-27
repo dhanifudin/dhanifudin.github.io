@@ -1,0 +1,66 @@
+---
+/**
+ * LineGutter.astro — wraps page content with relative line numbers
+ *
+ * Gives the "you're reading a buffer" effect. Usage:
+ *   <LineGutter>
+ *     <div class="prose">…content…</div>
+ *   </LineGutter>
+ */
+interface Props {
+  /** Number of visible lines to pre-render (default 60) */
+  lines?: number;
+  /** 1-based current line to highlight as cursor line */
+  cursorLine?: number;
+}
+
+const { lines = 60, cursorLine = 1 } = Astro.props;
+---
+
+<div class="editor-gutter" data-gutter>
+  <!-- Gutter column (line numbers rendered via JS so they match actual content) -->
+  <div class="gutter-col" id="gutter-numbers" aria-hidden="true">
+    {Array.from({ length: lines }, (_, i) => {
+      const n = i + 1;
+      const rel = Math.abs(n - cursorLine);
+      return (
+        <div
+          class:list={['ln', { 'current-ln': n === cursorLine, 'cursorline': n === cursorLine }]}
+          data-ln={n}
+          style={n === cursorLine ? 'color: var(--ctp-overlay2)' : ''}
+        >
+          {n === cursorLine ? n : (rel === 0 ? n : rel)}
+        </div>
+      );
+    })}
+  </div>
+
+  <!-- Content column -->
+  <div class="content-col">
+    <slot />
+  </div>
+</div>
+
+<script>
+  // Update line numbers dynamically based on actual rendered content height
+  (function() {
+    const gutter = document.getElementById('gutter-numbers');
+    const content = document.querySelector('[data-gutter] .content-col') as HTMLElement;
+    if (!gutter || !content) return;
+
+    function update() {
+      const lineH = parseFloat(getComputedStyle(content).lineHeight) || 23;
+      const total = Math.ceil(content.scrollHeight / lineH) + 5;
+      const current = gutter.children.length;
+      for (let i = current + 1; i <= total; i++) {
+        const div = document.createElement('div');
+        div.className = 'ln';
+        div.textContent = String(i - 1); // relative
+        gutter.appendChild(div);
+      }
+    }
+
+    update();
+    new ResizeObserver(update).observe(content);
+  })();
+</script>

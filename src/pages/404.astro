@@ -1,0 +1,71 @@
+---
+import EditorLayout from '../layouts/EditorLayout.astro';
+
+const lines = [
+  'Searching...',
+  '',
+  '--  No more items in search queue  --',
+  '',
+  '  :url not found in any buffer.',
+];
+---
+
+<EditorLayout title="404" description="Page not found">
+  <div
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 60vh;
+      text-align: center;
+      gap: 1rem;
+      font-family: var(--font-mono);
+    "
+  >
+    <div style="color: var(--ctp-red); font-size: 1.1rem; font-weight: 600;">
+      E486: Pattern not found
+    </div>
+
+    <pre style="color: var(--ctp-overlay0); font-size: 13px; text-align: left;">
+      {lines.join('\n')}
+    </pre>
+
+    <div style="display: flex; gap: 16px; margin-top: 1rem;">
+      <a
+        href="/"
+        style="
+          padding: 6px 16px;
+          background: var(--ctp-blue);
+          color: var(--ctp-base);
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 600;
+        "
+      >
+        :q — go home
+      </a>
+      <button
+        onclick="window.history.back()"
+        style="
+          padding: 6px 16px;
+          background: var(--ctp-surface0);
+          color: var(--ctp-text);
+          border: 1px solid var(--ctp-surface1);
+          border-radius: 4px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 13px;
+        "
+      >
+        ← go back
+      </button>
+    </div>
+
+    <div style="color: var(--ctp-overlay0); font-size: 12px; margin-top: 0.5rem;">
+      Press <kbd style="padding: 1px 6px; background: var(--ctp-surface0); border-radius: 3px;">Space</kbd> for navigation
+    </div>
+  </div>
+</EditorLayout>

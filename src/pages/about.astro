@@ -1,0 +1,51 @@
+---
+import EditorLayout from '../layouts/EditorLayout.astro';
+import LineGutter from '../components/nvim/LineGutter.astro';
+---
+
+<EditorLayout title="About" description="About Dian Hanifudin Subhi">
+  <LineGutter>
+    <article class="prose">
+      <h1>About</h1>
+
+      <p>
+        Hi, I'm <strong>Dian Hanifudin Subhi</strong> — a software engineer based in Indonesia.
+        I build things with code, care deeply about developer experience, and spend too much time
+        configuring my Neovim setup.
+      </p>
+
+      <h2>What I do</h2>
+      <p>
+        I work on web applications, tooling, and anything that sits at the intersection of
+        engineering and design. My work spans backend systems, frontend interfaces, and the
+        infrastructure that ties them together.
+      </p>
+
+      <h2>Tech I enjoy</h2>
+      <ul>
+        <li>Languages: TypeScript, Go, Python, a touch of Rust</li>
+        <li>Web: Astro, Vue, React — whatever fits the job</li>
+        <li>Editor: Neovim (LazyVim config, Catppuccin Mocha, Fira Code)</li>
+        <li>Infrastructure: containers, CI/CD, GitHub Actions</li>
+      </ul>
+
+      <h2>This site</h2>
+      <p>
+        Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> and
+        styled to look like Neovim. The UI mimics Neo-tree, bufferline, lualine, which-key, and
+        Telescope. Theme is Catppuccin (press <kbd>Space t</kbd> to toggle Latte ↔ Mocha).
+      </p>
+      <p>
+        The site accepts contributions via GitHub issues using the OpenCode IssueOps workflow —
+        see <a href="https://github.com/dhanifudin/dhanifudin.github.io/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+        for details.
+      </p>
+
+      <h2>Get in touch</h2>
+      <ul>
+        <li>GitHub: <a href="https://github.com/dhanifudin" target="_blank" rel="noopener">@dhanifudin</a></li>
+        <li>Email: <a href="mailto:dhanifudin@gmail.com">dhanifudin@gmail.com</a></li>
+      </ul>
+    </article>
+  </LineGutter>
+</EditorLayout>

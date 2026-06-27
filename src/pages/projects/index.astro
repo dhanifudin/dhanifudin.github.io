@@ -1,0 +1,141 @@
+---
+import { getCollection } from 'astro:content';
+import EditorLayout from '../../layouts/EditorLayout.astro';
+import LineGutter from '../../components/nvim/LineGutter.astro';
+
+const allProjects = await getCollection('projects');
+const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const featured  = projects.filter(p => p.data.featured);
+const rest      = projects.filter(p => !p.data.featured);
+---
+
+<EditorLayout title="Projects" description="Projects by Dian Hanifudin Subhi">
+  <LineGutter>
+    <div>
+      <h1
+        style="
+          color: var(--ctp-mauve);
+          font-size: 1.4rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        <span>▣</span>
+        <span>projects</span>
+        <span style="color: var(--ctp-overlay0); font-size: 1rem; font-weight: 400;">
+          — {projects.length} projects
+        </span>
+      </h1>
+
+      {featured.length > 0 && (
+        <section style="margin-bottom: 2rem;">
+          <h2 style="color: var(--ctp-blue); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 600;">
+            ⭐ Featured
+          </h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+            {featured.map(p => (
+              <div
+                style="
+                  padding: 16px;
+                  border: 1px solid var(--ctp-blue);
+                  border-radius: 8px;
+                  background: var(--ctp-surface0);
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="color: var(--ctp-blue);">◈</span>
+                  <span style="color: var(--ctp-text); font-weight: 500; font-size: 14px;">{p.data.title}</span>
+                </div>
+                <p style="color: var(--ctp-subtext0); font-size: 12px; margin-bottom: 10px;">{p.data.description}</p>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px;">
+                  {p.data.tags.map(tag => (
+                    <span style="padding: 1px 8px; background: var(--ctp-surface1); border-radius: 999px; font-size: 11px; color: var(--ctp-teal);">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div style="display: flex; gap: 12px;">
+                  {p.data.repo && (
+                    <a href={p.data.repo} target="_blank" rel="noopener" style="color: var(--ctp-blue); font-size: 12px; text-decoration: none;">
+                      ↗ repo
+                    </a>
+                  )}
+                  {p.data.url && (
+                    <a href={p.data.url} target="_blank" rel="noopener" style="color: var(--ctp-green); font-size: 12px; text-decoration: none;">
+                      ↗ live
+                    </a>
+                  )}
+                  <a href={`/projects/${p.id}`} style="color: var(--ctp-subtext0); font-size: 12px; text-decoration: none; margin-left: auto;">
+                    details →
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {rest.length > 0 && (
+        <section>
+          <h2 style="color: var(--ctp-subtext0); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 600;">
+            All Projects
+          </h2>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            {rest.map(p => (
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 12px;
+                  padding: 10px 14px;
+                  border: 1px solid var(--ctp-surface0);
+                  border-radius: 6px;
+                  transition: border-color 0.1s, background 0.1s;
+                "
+                class="project-row"
+              >
+                <span style="color: var(--ctp-blue); margin-top: 1px; flex-shrink: 0;">◈</span>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                    <a href={`/projects/${p.id}`} style="color: var(--ctp-text); font-size: 14px; font-weight: 500; text-decoration: none;">
+                      {p.data.title}
+                    </a>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      {p.data.tags.map(tag => (
+                        <span style="padding: 0 6px; background: var(--ctp-surface0); border-radius: 999px; font-size: 10px; color: var(--ctp-overlay1);">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <p style="color: var(--ctp-subtext0); font-size: 12px; margin-top: 2px; margin-bottom: 0;">{p.data.description}</p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                  {p.data.repo && (
+                    <a href={p.data.repo} target="_blank" rel="noopener" style="color: var(--ctp-blue); font-size: 12px; text-decoration: none;">↗</a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {projects.length === 0 && (
+        <p style="color: var(--ctp-overlay0); font-size: 13px;">
+          No projects yet.
+        </p>
+      )}
+    </div>
+  </LineGutter>
+</EditorLayout>
+
+<style is:global>
+.project-row:hover {
+  border-color: var(--ctp-blue) !important;
+  background: var(--ctp-surface0) !important;
+}
+</style>

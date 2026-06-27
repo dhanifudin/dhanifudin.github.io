@@ -1,0 +1,62 @@
+name: Bug Report
+description: Report something that looks broken or incorrect
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Be as specific as possible — the more detail you provide,
+        the more accurately the AI can understand and fix it.
+
+        **Triggering the fix:**
+        After filing this issue, a collaborator can comment `/plan` to get an implementation plan,
+        then `/build` to have it automatically implemented and submitted as a PR.
+
+  - type: input
+    id: url
+    attributes:
+      label: URL / Page
+      description: Which page or URL is affected?
+      placeholder: "e.g. /blog/hello-neovim or the dashboard"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly. Include what you expected vs what you saw.
+      placeholder: "The which-key popup doesn't close when pressing Escape..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to /blog
+        2. Press Space
+        3. Press Escape
+        4. Popup stays open
+    validations:
+      required: false
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options:
+        - Latte (light)
+        - Mocha (dark)
+        - Both
+    validations:
+      required: false
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: "e.g. Chrome 125, Firefox 126, Safari 17"
+    validations:
+      required: false

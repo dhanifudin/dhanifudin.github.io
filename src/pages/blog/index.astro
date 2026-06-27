@@ -1,0 +1,89 @@
+---
+import { getCollection } from 'astro:content';
+import EditorLayout from '../../layouts/EditorLayout.astro';
+import LineGutter from '../../components/nvim/LineGutter.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+---
+
+<EditorLayout title="Blog" description="Writing by Dian Hanifudin Subhi">
+  <LineGutter>
+    <div>
+      <h1
+        style="
+          color: var(--ctp-mauve);
+          font-size: 1.4rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        <span>▤</span>
+        <span>blog</span>
+        <span style="color: var(--ctp-overlay0); font-size: 1rem; font-weight: 400;">
+          — {posts.length} posts
+        </span>
+      </h1>
+
+      {posts.length === 0 ? (
+        <p style="color: var(--ctp-overlay0); font-size: 13px;">
+          No posts yet. <a href="https://github.com/dhanifudin/dhanifudin.github.io/issues/new/choose" style="color: var(--ctp-blue);">Suggest one →</a>
+        </p>
+      ) : (
+        <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1rem;">
+          {posts.map(post => (
+            <li>
+              <a
+                href={`/blog/${post.id}`}
+                style="
+                  display: block;
+                  padding: 12px 16px;
+                  border-radius: 6px;
+                  border: 1px solid var(--ctp-surface0);
+                  text-decoration: none;
+                  transition: border-color 0.1s, background 0.1s;
+                "
+                class="post-card"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                  <span style="color: var(--ctp-text); font-size: 14px; font-weight: 500;">
+                    ✎ {post.data.title}
+                  </span>
+                  <span style="color: var(--ctp-overlay0); font-size: 12px; flex-shrink: 0;">
+                    {new Date(post.data.date).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+                {post.data.description && (
+                  <p style="color: var(--ctp-subtext0); font-size: 12px; margin-top: 4px; margin-bottom: 0;">
+                    {post.data.description}
+                  </p>
+                )}
+                {post.data.tags.length > 0 && (
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;">
+                    {post.data.tags.map(tag => (
+                      <span style="padding: 1px 8px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-blue);">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </LineGutter>
+</EditorLayout>
+
+<style is:global>
+.post-card:hover {
+  border-color: var(--ctp-blue) !important;
+  background: var(--ctp-surface0) !important;
+}
+</style>

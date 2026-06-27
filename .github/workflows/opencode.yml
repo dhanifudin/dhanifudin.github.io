@@ -1,0 +1,363 @@
+name: OpenCode IssueOps
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  # ── 1. Auth gate ─────────────────────────────────────────────────────────────
+  check-auth:
+    name: Check authorization
+    runs-on: ubuntu-latest
+    outputs:
+      allowed:      ${{ steps.gate.outputs.allowed }}
+      command:      ${{ steps.gate.outputs.command }}
+      issue_number: ${{ steps.gate.outputs.issue_number }}
+      pr_number:    ${{ steps.gate.outputs.pr_number }}
+      comment_id:   ${{ steps.gate.outputs.comment_id }}
+    steps:
+      - name: Parse trigger and verify access
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const payload   = context.payload;
+            const eventName = context.eventName;
+            const sender    = context.actor;
+
+            // ── Extract command text ──────────────────────────────────────────
+            let bodyText   = '';
+            let issueNum   = null;
+            let prNum      = null;
+            let commentId  = null;
+
+            if (eventName === 'issues') {
+              bodyText  = payload.issue.title + '\n' + (payload.issue.body || '');
+              issueNum  = payload.issue.number;
+            } else if (eventName === 'issue_comment') {
+              bodyText  = payload.comment.body || '';
+              commentId = payload.comment.id;
+              issueNum  = payload.issue.number;
+              if (payload.issue.pull_request) prNum = payload.issue.number;
+            } else if (eventName === 'pull_request_review_comment') {
+              bodyText  = payload.comment.body || '';
+              commentId = payload.comment.id;
+              prNum     = payload.pull_request.number;
+            } else if (eventName === 'pull_request_review') {
+              bodyText  = payload.review.body || '';
+              prNum     = payload.pull_request.number;
+            }
+
+            // ── Detect /plan or /build at start of line ───────────────────────
+            const cmdMatch = bodyText.match(/^\/?(plan|build)\b/m);
+            if (!cmdMatch) {
+              core.setOutput('allowed', 'false');
+              core.setOutput('command', '');
+              return;
+            }
+            const command = cmdMatch[1];
+
+            // ── Access check: owner, collaborators, or allowlist ──────────────
+            const owner      = context.repo.owner;
+            const repo       = context.repo.repo;
+            const allowlist  = (process.env.OPENCODE_ALLOWLIST || '').split(',').map(s => s.trim()).filter(Boolean);
+
+            let allowed = false;
+            if (sender === owner || allowlist.includes(sender)) {
+              allowed = true;
+            } else {
+              try {
+                const resp = await github.rest.repos.checkCollaborator({
+                  owner, repo, username: sender,
+                });
+                allowed = resp.status === 204;
+              } catch { allowed = false; }
+            }
+
+            core.setOutput('allowed',      String(allowed));
+            core.setOutput('command',      command);
+            core.setOutput('issue_number', String(issueNum ?? ''));
+            core.setOutput('pr_number',    String(prNum ?? ''));
+            core.setOutput('comment_id',   String(commentId ?? ''));
+        env:
+          OPENCODE_ALLOWLIST: ${{ vars.OPENCODE_ALLOWLIST }}
+
+  # ── 2. Plan ──────────────────────────────────────────────────────────────────
+  plan:
+    name: Generate plan
+    needs: check-auth
+    if: needs.check-auth.outputs.allowed == 'true' && needs.check-auth.outputs.command == 'plan'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues:   write
+      pull-requests: write
+    steps:
+      - name: React to trigger
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNum   = parseInt('${{ needs.check-auth.outputs.issue_number }}') || null;
+            const commentId  = parseInt('${{ needs.check-auth.outputs.comment_id }}')  || null;
+            if (commentId) {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: commentId, content: 'eyes',
+              }).catch(() => {});
+            }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install OpenCode
+        run: npm install -g opencode-ai@latest
+
+      - name: Run OpenCode plan
+        id: plan
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
+          GITHUB_TOKEN:     ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER:     ${{ needs.check-auth.outputs.issue_number }}
+          PR_NUMBER:        ${{ needs.check-auth.outputs.pr_number }}
+          PLAN_MODEL:       ${{ vars.OPENCODE_PLAN_MODEL }}
+        run: |
+          opencode github run \
+            --issue "${ISSUE_NUMBER:-$PR_NUMBER}" \
+            ${PLAN_MODEL:+--model "$PLAN_MODEL"} \
+            2>&1 | tee /tmp/plan_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: React success / failure
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentId = parseInt('${{ needs.check-auth.outputs.comment_id }}') || null;
+            const success   = '${{ steps.plan.outputs.exit_code }}' === '0';
+            if (commentId) {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: commentId,
+                content: success ? 'rocket' : 'confused',
+              }).catch(() => {});
+            }
+
+  # ── 3. Build ─────────────────────────────────────────────────────────────────
+  build:
+    name: Implement plan
+    needs: check-auth
+    if: needs.check-auth.outputs.allowed == 'true' && needs.check-auth.outputs.command == 'build'
+    runs-on: ubuntu-latest
+    permissions:
+      contents:      write
+      issues:        write
+      pull-requests: write
+    env:
+      ISSUE_NUMBER: ${{ needs.check-auth.outputs.issue_number }}
+      BRANCH_NAME:  opencode/issue-${{ needs.check-auth.outputs.issue_number }}
+    steps:
+      - name: React eyes
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentId = parseInt('${{ needs.check-auth.outputs.comment_id }}') || null;
+            if (commentId) {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: commentId, content: 'eyes',
+              }).catch(() => {});
+            }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_WORKFLOW_PAT }}
+          fetch-depth: 0
+
+      - name: Setup git
+        run: |
+          git config user.name  "opencode[bot]"
+          git config user.email "opencode[bot]@users.noreply.github.com"
+
+      - name: Create / rebase branch
+        run: |
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME" > /dev/null 2>&1; then
+            git checkout "$BRANCH_NAME"
+            git rebase origin/main || git rebase --abort
+          else
+            git checkout -b "$BRANCH_NAME"
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install OpenCode
+        run: npm install -g opencode-ai@latest
+
+      - name: Gather issue discussion
+        id: discussion
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNum = parseInt(process.env.ISSUE_NUMBER);
+            const issue = await github.rest.issues.get({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: issueNum,
+            });
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: issueNum,
+            });
+            const discussion = [
+              `Issue #${issueNum}: ${issue.data.title}`,
+              '',
+              issue.data.body || '(no description)',
+              '',
+              '--- Comments ---',
+              ...comments.map(c => `@${c.user.login}: ${c.body}`),
+            ].join('\n');
+            const fs = require('fs');
+            fs.writeFileSync('/tmp/discussion.txt', discussion);
+            console.log('Discussion written to /tmp/discussion.txt');
+
+      - name: Run OpenCode build
+        id: oc_build
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
+          BUILD_MODEL:      ${{ vars.OPENCODE_BUILD_MODEL }}
+        run: |
+          opencode run \
+            --prompt-file /tmp/discussion.txt \
+            ${BUILD_MODEL:+--model "$BUILD_MODEL"} \
+            2>&1 | tee /tmp/build_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Verify build
+        run: npm run build
+
+      - name: Commit and push
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "feat: implement issue #${ISSUE_NUMBER} via opencode
+
+            Co-authored-by: opencode[bot] <opencode[bot]@users.noreply.github.com>"
+            git push origin "$BRANCH_NAME" --force-with-lease
+          fi
+
+      - name: Create or update PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_WORKFLOW_PAT }}
+          script: |
+            const issueNum  = parseInt(process.env.ISSUE_NUMBER);
+            const branch    = process.env.BRANCH_NAME;
+            const owner     = context.repo.owner;
+            const repo      = context.repo.repo;
+
+            // Check for existing PR
+            const prs = await github.rest.pulls.list({
+              owner, repo, head: `${owner}:${branch}`, state: 'open',
+            });
+
+            const body = `## OpenCode Implementation
+
+Implements #${issueNum}.
+
+<details>
+<summary>Build log</summary>
+
+\`\`\`
+See workflow run for full output.
+\`\`\`
+
+</details>
+
+---
+*Generated by [OpenCode IssueOps](https://github.com/${owner}/${repo}/blob/main/.github/workflows/opencode.yml)*`;
+
+            if (prs.data.length > 0) {
+              await github.rest.pulls.update({
+                owner, repo,
+                pull_number: prs.data[0].number,
+                body,
+              });
+              console.log(`Updated PR #${prs.data[0].number}`);
+            } else {
+              const pr = await github.rest.pulls.create({
+                owner, repo,
+                title: `feat: issue #${issueNum} (opencode)`,
+                head: branch,
+                base: 'main',
+                body,
+              });
+              // Link PR to issue
+              await github.rest.issues.createComment({
+                owner, repo,
+                issue_number: issueNum,
+                body: `🤖 OpenCode has opened PR #${pr.data.number} implementing this issue.\n\nReview at: ${pr.data.html_url}`,
+              });
+            }
+
+      - name: React success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentId = parseInt('${{ needs.check-auth.outputs.comment_id }}') || null;
+            if (commentId) {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: commentId, content: 'rocket',
+              }).catch(() => {});
+            }
+
+  # ── 4. Report error ──────────────────────────────────────────────────────────
+  report-error:
+    name: Report build error
+    needs: [check-auth, build]
+    if: always() && needs.build.result == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Comment error on issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNum = parseInt('${{ needs.check-auth.outputs.issue_number }}');
+            const runUrl   = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: issueNum,
+              body: `❌ OpenCode build failed. [View run](${runUrl}) for details.\n\nTry refining the request and comment \`/build\` again.`,
+            });
