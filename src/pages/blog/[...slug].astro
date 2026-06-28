@@ -16,7 +16,7 @@ const { Content } = await render(post);
 const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
 ---
 
-<EditorLayout title={post.data.title} description={post.data.description}>
+<EditorLayout title={post.data.title} description={post.data.description} ogType="article">
   <LineGutter>
     <article class="prose">
       <!-- File info header (buffer modeline style) -->
