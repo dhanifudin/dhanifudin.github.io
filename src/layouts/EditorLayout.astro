@@ -27,11 +27,16 @@ import CommandPalette    from '../components/nvim/CommandPalette.vue';
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  ogType?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage, ogType } = Astro.props;
 const currentPath = Astro.url.pathname;
 const pageTitle   = title ? `${title} — ${profile.handle}` : profile.handle;
+const canonicalUrl = new URL(currentPath, Astro.site).href;
+const ogDescription = description || profile.tagline;
+const ogImageUrl = new URL(ogImage || '/og-image.png', Astro.site).href;
 
 // Fetch collections for tree + palette
 const allPosts    = await getCollection('blog', ({ data }) => !data.draft).catch(() => []);
@@ -65,6 +70,25 @@ const projectMeta = allProjects
   <meta name="generator" content={Astro.generator} />
   <title>{pageTitle}</title>
   {description && <meta name="description" content={description} />}
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:type" content={ogType || 'website'} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content={profile.handle} />
+  <meta property="og:image" content={ogImageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={ogDescription} />
+  <meta name="twitter:image" content={ogImageUrl} />
+
+  <!-- Canonical -->
+  <link rel="canonical" href={canonicalUrl} />
 
   <!-- No-FOUC: apply stored theme before paint -->
   <script is:inline>
