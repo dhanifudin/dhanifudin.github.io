@@ -235,8 +235,7 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
           BUILD_MODEL:      ${{ vars.OPENCODE_BUILD_MODEL }}
         run: |
-          opencode run \
-            --prompt-file /tmp/discussion.txt \
+          opencode run "$(cat /tmp/discussion.txt)" \
             ${BUILD_MODEL:+--model "$BUILD_MODEL"} \
             2>&1 | tee /tmp/build_output.txt
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
@@ -245,18 +244,22 @@ jobs:
         run: npm run build
 
       - name: Commit and push
+        id: commit
         run: |
           git add -A
           if git diff --staged --quiet; then
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             echo "No changes to commit"
           else
             git commit -m "feat: implement issue #${ISSUE_NUMBER} via opencode
 
             Co-authored-by: opencode[bot] <opencode[bot]@users.noreply.github.com>"
             git push origin "$BRANCH_NAME" --force-with-lease
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create or update PR
+        if: steps.commit.outputs.pushed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GH_WORKFLOW_PAT }}
@@ -301,8 +304,23 @@ jobs:
               });
             }
 
+      - name: Comment no-changes notice
+        if: steps.commit.outputs.pushed != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNum = parseInt(process.env.ISSUE_NUMBER);
+            const runUrl   = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: issueNum,
+              body: '⚠️ OpenCode ran but made no file changes. [View run](' + runUrl + ') for details.\n\nTry adding more detail to the issue and comment `/build` again.',
+            });
+
       - name: React success
-        if: success()
+        if: success() && steps.commit.outputs.pushed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
