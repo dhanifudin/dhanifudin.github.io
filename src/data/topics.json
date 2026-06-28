@@ -1,0 +1,49 @@
+{
+  "streams": [
+    {
+      "name": "Cloud & DevOps",
+      "topics": [
+        "cloud computing fundamentals",
+        "containers and Docker",
+        "Kubernetes for developers",
+        "CI/CD pipelines with GitHub Actions",
+        "infrastructure as code (Terraform, Pulumi)",
+        "observability: logs, metrics, traces",
+        "self-hosting and homelab setups",
+        "serverless and edge computing",
+        "cloud cost optimisation",
+        "GitOps workflows"
+      ]
+    },
+    {
+      "name": "Backend Development",
+      "topics": [
+        "building REST APIs with Go",
+        "gRPC services in practice",
+        "database design and migrations",
+        "authentication and authorisation patterns",
+        "message queues and event-driven architecture",
+        "unit and integration testing for backend services",
+        "API versioning strategies",
+        "caching patterns (Redis, in-memory)",
+        "rate limiting and throttling",
+        "writing CLIs in Go"
+      ]
+    },
+    {
+      "name": "Developer Environment & CLI",
+      "topics": [
+        "Neovim from scratch to LazyVim",
+        "Lua scripting for Neovim plugins",
+        "Nix for reproducible developer environments",
+        "managing dotfiles with Nix (Home Manager)",
+        "terminal workflows: tmux, zsh, fzf",
+        "shell scripting best practices",
+        "Git internals and advanced workflows",
+        "multiplexers and session management",
+        "fuzzy-finding everything with fzf/telescope",
+        "living in the terminal: tips for CLI-first development"
+      ]
+    }
+  ]
+}

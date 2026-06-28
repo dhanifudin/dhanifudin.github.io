@@ -4,9 +4,9 @@
 export const profile = {
   name: 'Dian Hanifudin Subhi',
   handle: 'dhanifudin',
-  role: 'Software Engineer',
-  tagline: 'Building things with code. Living in the terminal.',
-  location: 'Indonesia',
+  role: 'Lecturer · Cloud Engineer',
+  tagline: 'Cloud engineer, backend developer & lecturer. Technology-agnostic, CLI-first.',
+  location: 'Malang, Indonesia',
 } as const;
 
 export interface PageDef {
@@ -41,8 +41,10 @@ export interface Social {
 }
 
 export const socials: Social[] = [
-  { label: 'GitHub',   url: 'https://github.com/dhanifudin',      icon: '' },
-  { label: 'Email',    url: 'mailto:dhanifudin@gmail.com',         icon: '✉' },
+  { label: 'GitHub',    url: 'https://github.com/dhanifudin',              icon: '' },
+  { label: 'LinkedIn',  url: 'https://www.linkedin.com/in/dhanifudin/',    icon: 'in' },
+  { label: 'YouTube',   url: 'https://youtube.com/c/dhanifudin',           icon: '▶' },
+  { label: 'Email',     url: 'mailto:dhanifudin@gmail.com',                icon: '✉' },
 ];
 
 // WhichKey binding map (used by WhichKey.vue)

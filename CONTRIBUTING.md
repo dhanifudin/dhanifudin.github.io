@@ -71,6 +71,7 @@ To activate the OpenCode IssueOps workflow, add these in **Settings → Secrets 
 |----------|---------|-------------|
 | `OPENCODE_PLAN_MODEL` | kimi-k2.7 | Model for `/plan` |
 | `OPENCODE_BUILD_MODEL` | deepseek-v4-pro | Model for `/build` |
+| `OPENCODE_RECOMMEND_MODEL` | `opencode-go/kimi-k2.7-code` | Model for weekly recommendation |
 | `OPENCODE_ALLOWLIST` | _(empty)_ | Comma-separated GitHub usernames with access |
 
 ### GitHub Pages
@@ -96,6 +97,22 @@ npm run build
 ```
 
 The site is at `http://localhost:4321` by default.
+
+---
+
+## Weekly automated issues
+
+Every Monday at ~08:00 WIB (01:00 UTC) the **Weekly Recommendation** workflow runs automatically.
+It builds the site, reads the existing issues and blog posts, then asks OpenCode to propose the
+single most valuable improvement — filed as a GitHub issue labelled `automated` plus either `bug`,
+`enhancement`, or `documentation`.
+
+The owner (or a collaborator) can then comment `/plan` on that issue to start implementation,
+exactly like any manually-filed issue. The weekly run can also be triggered manually from
+**Actions → Weekly Recommendation → Run workflow**, optionally forcing a specific focus category.
+
+Required GitHub labels (`bug`, `enhancement`, `documentation`, `automated`) must exist in the repo
+for the workflow to apply them; create them via **Issues → Labels** if missing.
 
 ---
 

@@ -71,11 +71,27 @@ no local development required.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide including the `/plan` and `/build`
 commands, required secrets, and access control.
 
-### Required secrets for OpenCode (repo owner setup)
+### Weekly self-improvement
+
+Every Monday the **Weekly Recommendation** workflow runs automatically: it builds the site, surveys
+existing issues and blog posts, then asks OpenCode to propose one improvement (bug / feature /
+tutorial blog post) and files it as a GitHub issue. The owner can then comment `/plan` → `/build`
+to implement it. The cycle keeps the site alive without manual overhead.
+
+To trigger it manually or force a focus category: **Actions → Weekly Recommendation → Run workflow**.
+
+### Required secrets & variables (repo owner setup)
 
 | Secret | Description |
 |--------|-------------|
-| `OPENCODE_GO_API_KEY` | OpenCode API key |
-| `GH_WORKFLOW_PAT` | PAT with `repo` + `pull_requests` write |
+| `OPENCODE_GO_API_KEY` | OpenCode API key (used by all three workflows) |
+| `GH_WORKFLOW_PAT` | PAT with `repo` + `pull_requests` write (used by `/build`) |
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENCODE_PLAN_MODEL` | kimi-k2.7 | Model for `/plan` |
+| `OPENCODE_BUILD_MODEL` | deepseek-v4-pro | Model for `/build` |
+| `OPENCODE_RECOMMEND_MODEL` | `opencode-go/kimi-k2.7-code` | Model for weekly recommendation |
+| `OPENCODE_ALLOWLIST` | _(empty)_ | Comma-separated GitHub usernames with `/plan`/`/build` access |
 
 Enable GitHub Pages in **Settings → Pages → Source: GitHub Actions**.
