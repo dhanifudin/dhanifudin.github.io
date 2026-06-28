@@ -138,7 +138,7 @@ jobs:
           echo "=== OpenCode stderr (last 30 lines) ==="
           tail -30 /tmp/oc-err.txt || true
         env:
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
+          OPENCODE_GO_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
           MODEL: ${{ vars.OPENCODE_RECOMMEND_MODEL || 'opencode-go/kimi-k2.7-code' }}
 
       - name: Create issue
