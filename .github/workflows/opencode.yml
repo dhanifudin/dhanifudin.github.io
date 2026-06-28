@@ -64,30 +64,15 @@ jobs:
             }
             const command = cmdMatch[1];
 
-            // ── Access check: owner, collaborators, or allowlist ──────────────
-            const owner      = context.repo.owner;
-            const repo       = context.repo.repo;
-            const allowlist  = (process.env.OPENCODE_ALLOWLIST || '').split(',').map(s => s.trim()).filter(Boolean);
-
-            let allowed = false;
-            if (sender === owner || allowlist.includes(sender)) {
-              allowed = true;
-            } else {
-              try {
-                const resp = await github.rest.repos.checkCollaborator({
-                  owner, repo, username: sender,
-                });
-                allowed = resp.status === 204;
-              } catch { allowed = false; }
-            }
+            // ── Access check: repo owner (dhanifudin) only ───────────────────
+            const owner   = context.repo.owner;
+            const allowed = sender === owner;
 
             core.setOutput('allowed',      String(allowed));
             core.setOutput('command',      command);
             core.setOutput('issue_number', String(issueNum ?? ''));
             core.setOutput('pr_number',    String(prNum ?? ''));
             core.setOutput('comment_id',   String(commentId ?? ''));
-        env:
-          OPENCODE_ALLOWLIST: ${{ vars.OPENCODE_ALLOWLIST }}
 
   # ── 2. Plan ──────────────────────────────────────────────────────────────────
   plan:

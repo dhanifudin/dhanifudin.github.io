@@ -45,12 +45,8 @@ Review the diff, leave comments, and request changes if needed. Collaborators ca
 
 ## Access control
 
-The `/plan` and `/build` commands are gated to:
-- Repository **owner** (dhanifudin)
-- Repository **collaborators**
-- Users listed in the `OPENCODE_ALLOWLIST` repository variable (comma-separated GitHub usernames)
-
-This prevents spam while keeping contributions open.
+The `/plan` and `/build` commands are restricted to the repository **owner** (`dhanifudin`) only.
+Everyone else is welcome to open issues — the owner will review and trigger the commands.
 
 ---
 
@@ -72,7 +68,6 @@ To activate the OpenCode IssueOps workflow, add these in **Settings → Secrets 
 | `OPENCODE_PLAN_MODEL` | kimi-k2.7 | Model for `/plan` |
 | `OPENCODE_BUILD_MODEL` | deepseek-v4-pro | Model for `/build` |
 | `OPENCODE_RECOMMEND_MODEL` | `opencode-go/kimi-k2.7-code` | Model for weekly recommendation |
-| `OPENCODE_ALLOWLIST` | _(empty)_ | Comma-separated GitHub usernames with access |
 
 ### GitHub Pages
 

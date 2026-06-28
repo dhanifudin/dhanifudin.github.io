@@ -92,6 +92,5 @@ To trigger it manually or force a focus category: **Actions → Weekly Recommend
 | `OPENCODE_PLAN_MODEL` | kimi-k2.7 | Model for `/plan` |
 | `OPENCODE_BUILD_MODEL` | deepseek-v4-pro | Model for `/build` |
 | `OPENCODE_RECOMMEND_MODEL` | `opencode-go/kimi-k2.7-code` | Model for weekly recommendation |
-| `OPENCODE_ALLOWLIST` | _(empty)_ | Comma-separated GitHub usernames with `/plan`/`/build` access |
 
 Enable GitHub Pages in **Settings → Pages → Source: GitHub Actions**.
