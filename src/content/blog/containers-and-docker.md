@@ -67,6 +67,9 @@ A Dockerfile is a linear script of instructions. The key ones:
 
 ## A real-world example — Go API with multi-stage builds
 
+(If you don't have a Go API yet, follow the [Go REST API tutorial](/blog/building-rest-apis-with-go)
+to build one — then come back here to containerise it.)
+
 Let's build an image for a small Go REST API. A naive Dockerfile copies the source, installs Go,
 compiles, and ships everything — including the entire Go toolchain. The result? A 900 MB image
 serving a 10 MB binary.
