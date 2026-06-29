@@ -8,7 +8,8 @@ draft: false
 
 ## Why Kubernetes after Docker
 
-In the [Docker primer](/blog/containers-and-docker) we containerised a Go API, wired it to
+In the [Go REST API tutorial](/blog/building-rest-apis-with-go) we built an API from scratch,
+then [containerised it with Docker](/blog/containers-and-docker), wired it to
 PostgreSQL and Redis with Compose, and ran everything on one machine with `docker compose up`.
 That workflow carries you through development, but it hits a wall the moment you need more than
 one host.
