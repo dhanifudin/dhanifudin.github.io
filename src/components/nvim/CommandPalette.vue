@@ -4,11 +4,23 @@
  *
  * Opens with <leader>f or clicking the find icon.
  * Fuzzy-searches pages + blog posts + projects.
+ * Loads a static search-index.json for full-text body search.
  * Keyboard: ↑/↓ or Ctrl-j/k move; Enter navigates; Esc closes.
  */
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useLeader } from './useLeader';
 import type { PageDef } from '../../data/site';
+
+interface SearchEntry {
+  id: string;
+  type: 'post' | 'project';
+  title: string;
+  description: string;
+  tags: string[];
+  path: string;
+  content: string;
+  date?: string;
+}
 
 interface PaletteItem {
   type: 'page' | 'post' | 'project';
@@ -16,6 +28,12 @@ interface PaletteItem {
   subtitle: string;
   icon: string;
   path: string;
+  _content?: string;
+}
+
+interface FilteredItem extends PaletteItem {
+  snippet?: string;
+  relevance: 'title' | 'description' | 'content';
 }
 
 interface BlogMeta   { id: string; title: string; path: string; date?: string; tags?: string[] }
@@ -29,11 +47,33 @@ const props = defineProps<{
 
 const { paletteOpen, closePalette } = useLeader();
 
-const query    = ref('');
-const selected = ref(0);
-const inputRef = ref<HTMLInputElement | null>(null);
+const query      = ref('');
+const selected   = ref(0);
+const inputRef   = ref<HTMLInputElement | null>(null);
+const searchData = ref<Map<string, SearchEntry>>(new Map());
 
-// Build full item list
+async function loadSearchIndex() {
+  try {
+    const res = await fetch('/search-index.json');
+    if (!res.ok) return;
+    const entries: SearchEntry[] = await res.json();
+    const map = new Map<string, SearchEntry>();
+    for (const e of entries) {
+      map.set(e.path, e);
+    }
+    searchData.value = map;
+  } catch {
+    // search index is optional; fall back to title/subtitle matching
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown);
+  loadSearchIndex();
+});
+
+onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
+
 const allItems = computed<PaletteItem[]>(() => [
   ...props.pages.map(p => ({
     type: 'page' as const,
@@ -42,23 +82,30 @@ const allItems = computed<PaletteItem[]>(() => [
     icon: p.icon,
     path: p.path,
   })),
-  ...props.blogPosts.map(p => ({
-    type: 'post' as const,
-    title: p.title,
-    subtitle: p.date ?? '',
-    icon: '✎',
-    path: p.path,
-  })),
-  ...props.projects.map(p => ({
-    type: 'project' as const,
-    title: p.title,
-    subtitle: (p.tags ?? []).join(', '),
-    icon: '◈',
-    path: p.path,
-  })),
+  ...props.blogPosts.map(p => {
+    const idx = searchData.value.get(p.path);
+    return {
+      type: 'post' as const,
+      title: p.title,
+      subtitle: p.date ?? '',
+      icon: '✎',
+      path: p.path,
+      _content: idx?.content || idx?.description || '',
+    };
+  }),
+  ...props.projects.map(p => {
+    const idx = searchData.value.get(p.path);
+    return {
+      type: 'project' as const,
+      title: p.title,
+      subtitle: (p.tags ?? []).join(', '),
+      icon: '◈',
+      path: p.path,
+      _content: idx?.content || idx?.description || '',
+    };
+  }),
 ]);
 
-// Simple fuzzy filter
 function fuzzyMatch(text: string, pattern: string) {
   const t = text.toLowerCase();
   const p = pattern.toLowerCase();
@@ -72,12 +119,86 @@ function fuzzyMatch(text: string, pattern: string) {
   return true;
 }
 
-const filtered = computed<PaletteItem[]>(() => {
+function generateSnippet(content: string, query: string): string {
+  const lowerContent = content.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+
+  let idx = lowerContent.indexOf(lowerQuery);
+  if (idx === -1) {
+    let ti = 0;
+    for (let pi = 0; pi < lowerQuery.length; pi++) {
+      const found = lowerContent.indexOf(lowerQuery[pi], ti);
+      if (found === -1) break;
+      ti = found + 1;
+      if (pi === 0) idx = found;
+    }
+  }
+
+  if (idx === -1) return '';
+
+  const snippetLen = 150;
+  const contextBefore = Math.floor((snippetLen - query.length) / 2);
+  const start = Math.max(0, idx - contextBefore);
+  const end = Math.min(content.length, start + snippetLen);
+
+  let snippet = content.slice(start, end);
+  if (start > 0) snippet = '\u2026' + snippet;
+  if (end < content.length) snippet += '\u2026';
+
+  return snippet;
+}
+
+function highlightSnippet(snippet: string, query: string): string {
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return snippet.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const pattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(${pattern})`, 'gi');
+
+  return snippet
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(regex, '<mark class="search-match">$1</mark>');
+}
+
+const filtered = computed<FilteredItem[]>(() => {
   const q = query.value.trim();
-  if (!q) return allItems.value;
-  return allItems.value.filter(item =>
-    fuzzyMatch(item.title, q) || fuzzyMatch(item.subtitle, q)
-  );
+  if (!q) return allItems.value.map(item => ({
+    ...item,
+    relevance: 'title' as const,
+  }));
+
+  const results: FilteredItem[] = [];
+
+  for (const item of allItems.value) {
+    const titleMatch = fuzzyMatch(item.title, q);
+    const subtitleMatch = fuzzyMatch(item.subtitle, q);
+    const contentMatch = item._content ? fuzzyMatch(item._content, q) : false;
+
+    if (!titleMatch && !subtitleMatch && !contentMatch) continue;
+
+    let relevance: FilteredItem['relevance'];
+    let snippet: string | undefined;
+
+    if (titleMatch) {
+      relevance = 'title';
+    } else if (subtitleMatch) {
+      relevance = 'description';
+    } else if (contentMatch && item._content) {
+      relevance = 'content';
+      snippet = generateSnippet(item._content, q);
+    } else {
+      relevance = 'title';
+    }
+
+    results.push({ ...item, relevance, snippet });
+  }
+
+  const order = { title: 0, description: 1, content: 2 };
+  results.sort((a, b) => order[a.relevance] - order[b.relevance]);
+
+  return results;
 });
 
 function close() {
@@ -94,7 +215,6 @@ function confirm() {
   }
 }
 
-// Focus input when opened
 watch(paletteOpen, async (open) => {
   if (open) {
     selected.value = 0;
@@ -131,9 +251,6 @@ function onKeyDown(e: KeyboardEvent) {
       break;
   }
 }
-
-onMounted(() => window.addEventListener('keydown', onKeyDown));
-onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
 </script>
 
 <template>
@@ -223,7 +340,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
             :key="item.path"
             :style="{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: '10px',
               padding: '7px 12px',
               cursor: 'pointer',
@@ -234,18 +351,51 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
             @click="selected = idx; confirm()"
             @mouseenter="selected = idx"
           >
-            <span :style="{ color: 'var(--ctp-blue)', flexShrink: 0, width: '16px' }">{{ item.icon }}</span>
-            <div :style="{ flex: 1, overflow: 'hidden' }">
+            <span :style="{ color: 'var(--ctp-blue)', flexShrink: 0, width: '16px', paddingTop: '1px' }">{{ item.icon }}</span>
+            <div :style="{ flex: 1, overflow: 'hidden', minWidth: 0 }">
+              <div :style="{ display: 'flex', alignItems: 'center', gap: '6px' }">
+                <span
+                  :style="{
+                    color: idx === selected ? 'var(--ctp-text)' : 'var(--ctp-subtext1)',
+                    fontSize: '13px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    flex: 1,
+                    minWidth: 0,
+                  }"
+                >{{ item.title }}</span>
+                <span
+                  v-if="item.relevance === 'content'"
+                  :style="{
+                    padding: '1px 5px',
+                    background: 'var(--ctp-peach)',
+                    color: 'var(--ctp-crust)',
+                    borderRadius: '3px',
+                    fontSize: '9px',
+                    fontWeight: '600',
+                    flexShrink: 0,
+                    textTransform: 'uppercase',
+                  }"
+                >match</span>
+              </div>
               <div
+                v-if="item.snippet"
                 :style="{
-                  color: idx === selected ? 'var(--ctp-text)' : 'var(--ctp-subtext1)',
-                  fontSize: '13px',
+                  color: 'var(--ctp-overlay1)',
+                  fontSize: '11px',
+                  marginTop: '2px',
+                  lineHeight: '1.4',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
                 }"
-              >{{ item.title }}</div>
+                v-html="highlightSnippet(item.snippet, query)"
+              />
               <div
+                v-else
                 :style="{
                   color: 'var(--ctp-overlay0)',
                   fontSize: '11px',
@@ -312,5 +462,13 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
 .tel-enter-active .container,
 .tel-leave-active .container {
   transition: transform 0.15s ease;
+}
+
+:deep(.search-match) {
+  background: var(--ctp-surface0);
+  color: var(--ctp-peach);
+  font-weight: 600;
+  border-radius: 1px;
+  padding: 0 1px;
 }
 </style>
