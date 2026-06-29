@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.0",
+    "@astrojs/rss": "^4.0.18",
     "@astrojs/vue": "^7.0.0",
     "@fontsource/fira-code": "^5.2.7",
     "@tailwindcss/vite": "^4.3.1",

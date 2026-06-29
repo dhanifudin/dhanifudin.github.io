@@ -5,6 +5,8 @@ feel like **Neovim** with the [LazyVim](https://www.lazyvim.org) distribution.
 
 [![Deploy](https://github.com/dhanifudin/dhanifudin.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/dhanifudin/dhanifudin.github.io/actions/workflows/deploy.yml)
 
+**Subscribe:** [RSS feed](https://dhanifudin.github.io/rss.xml) for blog posts.
+
 ## The UI
 
 The site mimics a full Neovim session:
