@@ -163,37 +163,64 @@ const projectMeta = allProjects
         position: relative;
       "
     >
-      <!-- Mobile top bar (shown only on small screens) -->
+      <!-- Mobile tab bar (shown only on small screens, mirrors BufferLine style) -->
       <div
         class="mobile-bar"
         style="
           display: none;
-          align-items: center;
-          gap: 8px;
+          flex-direction: column;
           margin-bottom: 1rem;
-          padding-bottom: 0.75rem;
-          border-bottom: 1px solid var(--ctp-surface0);
         "
       >
-        <span style="color: var(--ctp-mauve); font-weight: 600; font-size: 13px;">
+        <div style="
+          color: var(--ctp-mauve);
+          font-weight: 600;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 4px 8px;
+          user-select: none;
+        ">
           {profile.handle}
-        </span>
-        <nav style="display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap;">
-          {pages.map(p => (
-            <a
-              href={p.path}
-              style={`
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                text-decoration: none;
-                color: ${currentPath === p.path || currentPath.startsWith(p.path + '/') ? 'var(--ctp-blue)' : 'var(--ctp-subtext1)'};
-                background: ${currentPath === p.path || currentPath.startsWith(p.path + '/') ? 'var(--ctp-surface0)' : 'transparent'};
-              `}
-            >
-              {p.icon} {p.label}
-            </a>
-          ))}
+        </div>
+        <nav style="
+          display: flex;
+          background: var(--ctp-crust);
+          border: 1px solid var(--ctp-surface0);
+          border-radius: 4px;
+          overflow-x: auto;
+          height: 36px;
+          align-items: stretch;
+        " class="scrollbar-hide">
+          {pages.map(p => {
+            const active = currentPath === p.path || currentPath.startsWith(p.path + '/');
+            return (
+              <a
+                href={p.path}
+                style={`
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 0 16px;
+                  text-decoration: none;
+                  white-space: nowrap;
+                  font-size: 13px;
+                  border-bottom: 2px solid ${active ? 'var(--ctp-blue)' : 'transparent'};
+                  color: ${active ? 'var(--ctp-text)' : 'var(--ctp-overlay1)'};
+                  background: ${active ? 'var(--ctp-surface0)' : 'transparent'};
+                  transition: color 0.1s, border-color 0.1s;
+                `}
+              >
+                <span style={`color: ${active ? 'var(--ctp-blue)' : 'var(--ctp-overlay1)'}`}>
+                  {p.icon}
+                </span>
+                <span>{p.label}</span>
+                {active && (
+                  <span style="color: var(--ctp-overlay0); font-size: 11px;">●</span>
+                )}
+              </a>
+            );
+          })}
         </nav>
       </div>
 
@@ -211,7 +238,7 @@ const projectMeta = allProjects
 </html>
 
 <style is:global>
-  /* Mobile: show mobile bar, hide neotree */
+  /* Mobile: show mobile tab bar (NeoTree hidden by default via useLeader viewport init) */
   @media (max-width: 768px) {
     .mobile-bar {
       display: flex !important;

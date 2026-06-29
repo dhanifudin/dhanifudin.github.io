@@ -15,7 +15,7 @@ export type LeaderState = 'idle' | 'leader' | 'sub:g' | 'sub:b';
 const _state       = ref<LeaderState>('idle');
 const _whichKeyOpen = ref(false);
 const _paletteOpen  = ref(false);
-const _neoTreeOpen  = ref(true);
+const _neoTreeOpen  = ref(typeof window === 'undefined' ? true : window.innerWidth > 768);
 
 // ─── Page order for buffer cycling ────────────────────────────────────────────
 const PAGE_ORDER = ['/', '/about', '/blog', '/projects'] as const;
