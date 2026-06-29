@@ -163,67 +163,6 @@ const projectMeta = allProjects
         position: relative;
       "
     >
-      <!-- Mobile tab bar (shown only on small screens, mirrors BufferLine style) -->
-      <div
-        class="mobile-bar"
-        style="
-          display: none;
-          flex-direction: column;
-          margin-bottom: 1rem;
-        "
-      >
-        <div style="
-          color: var(--ctp-mauve);
-          font-weight: 600;
-          font-size: 11px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          padding: 4px 8px;
-          user-select: none;
-        ">
-          {profile.handle}
-        </div>
-        <nav style="
-          display: flex;
-          background: var(--ctp-crust);
-          border: 1px solid var(--ctp-surface0);
-          border-radius: 4px;
-          overflow-x: auto;
-          height: 36px;
-          align-items: stretch;
-        " class="scrollbar-hide">
-          {pages.map(p => {
-            const active = currentPath === p.path || currentPath.startsWith(p.path + '/');
-            return (
-              <a
-                href={p.path}
-                style={`
-                  display: flex;
-                  align-items: center;
-                  gap: 6px;
-                  padding: 0 16px;
-                  text-decoration: none;
-                  white-space: nowrap;
-                  font-size: 13px;
-                  border-bottom: 2px solid ${active ? 'var(--ctp-blue)' : 'transparent'};
-                  color: ${active ? 'var(--ctp-text)' : 'var(--ctp-overlay1)'};
-                  background: ${active ? 'var(--ctp-surface0)' : 'transparent'};
-                  transition: color 0.1s, border-color 0.1s;
-                `}
-              >
-                <span style={`color: ${active ? 'var(--ctp-blue)' : 'var(--ctp-overlay1)'}`}>
-                  {p.icon}
-                </span>
-                <span>{p.label}</span>
-                {active && (
-                  <span style="color: var(--ctp-overlay0); font-size: 11px;">●</span>
-                )}
-              </a>
-            );
-          })}
-        </nav>
-      </div>
-
       <slot />
     </main>
   </div>
@@ -238,10 +177,9 @@ const projectMeta = allProjects
 </html>
 
 <style is:global>
-  /* Mobile: show mobile tab bar (NeoTree hidden by default via useLeader viewport init) */
+  /* Mobile: hide NeoTree sidebar and desktop-only keycap hints */
   @media (max-width: 768px) {
-    .mobile-bar {
-      display: flex !important;
-    }
+    .neotree        { display: none !important; }
+    .buffer-hints   { display: none !important; }
   }
 </style>

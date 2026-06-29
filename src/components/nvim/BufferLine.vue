@@ -78,8 +78,9 @@ function navigate(page: PageDef) {
     <!-- Spacer -->
     <div :style="{ flex: 1 }" />
 
-    <!-- Buffer index hint (right side) -->
+    <!-- Buffer index hint (right side, desktop only) -->
     <div
+      class="buffer-hints"
       :style="{
         display: 'flex',
         alignItems: 'center',
