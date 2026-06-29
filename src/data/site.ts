@@ -5,7 +5,7 @@ export const profile = {
   name: 'Dian Hanifudin Subhi',
   handle: 'dhanifudin',
   role: 'Lecturer · Cloud Engineer',
-  tagline: 'Cloud engineer, backend developer & lecturer. Technology-agnostic, CLI-first.',
+  tagline: 'Building cloud infrastructure, scalable backends & teaching future engineers. Open for collaboration.',
   location: 'Malang, Indonesia',
 } as const;
 
@@ -45,6 +45,7 @@ export const socials: Social[] = [
   { label: 'LinkedIn',  url: 'https://www.linkedin.com/in/dhanifudin/',    icon: 'in' },
   { label: 'YouTube',   url: 'https://youtube.com/c/dhanifudin',           icon: '▶' },
   { label: 'Email',     url: 'mailto:dhanifudin@gmail.com',                icon: '✉' },
+  { label: 'WhatsApp',  url: 'https://wa.me/6282230743546',              icon: '📱' },
 ];
 
 // WhichKey binding map (used by WhichKey.vue)
@@ -90,10 +91,9 @@ export interface DashboardItem {
 export const dashboardItems: DashboardItem[] = [
   { key: 'f', icon: '🔍', label: 'Find File',           action: 'palette' },
   { key: 'n', icon: '✎',  label: 'New Issue / Suggest', action: 'external', target: 'https://github.com/dhanifudin/dhanifudin.github.io/issues/new/choose' },
-  { key: 'a', icon: '✎',  label: 'About Me',            action: 'navigate', target: '/about' },
+  { key: 'a', icon: '👤',  label: 'About Me',            action: 'navigate', target: '/about' },
   { key: 'b', icon: '▤',  label: 'Blog',                action: 'navigate', target: '/blog' },
   { key: 'p', icon: '▣',  label: 'Projects',            action: 'navigate', target: '/projects' },
-  { key: 'g', icon: '⌂',  label: 'GitHub Profile',      action: 'external', target: 'https://github.com/dhanifudin' },
-  { key: 'c', icon: '⚙',  label: 'Config / Repo',       action: 'external', target: 'https://github.com/dhanifudin/dhanifudin.github.io' },
+  { key: 'g', icon: '',  label: 'GitHub Profile',      action: 'external', target: 'https://github.com/dhanifudin' },
   { key: 'q', icon: '×',  label: 'Quit',                action: 'leader',   leaderAction: 'quit' },
 ];
