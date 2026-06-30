@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
 import TableOfContents from '../../components/nvim/TableOfContents.astro';
+import SeriesNavigation from '../../components/nvim/SeriesNavigation.astro';
 import { slugify } from '../../utils/slugify';
 import { getAdjacentPosts } from '../../utils/postNav';
 
@@ -71,6 +72,10 @@ const { prev, next } = getAdjacentPosts(sortedPosts, post.id);
             </a>
           ))}
         </div>
+      )}
+
+      {post.data.series && (
+        <SeriesNavigation series={post.data.series} currentPostId={post.id} />
       )}
     </div>
 

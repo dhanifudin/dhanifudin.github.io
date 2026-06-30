@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import EditorLayout from '../../layouts/EditorLayout.astro';
+import LineGutter from '../../components/nvim/LineGutter.astro';
+import { slugify } from '../../utils/slugify';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+  const seriesMap = new Map<string, { name: string; description?: string }>();
+
+  for (const post of allPosts) {
+    if (post.data.series && !seriesMap.has(post.data.series.id)) {
+      seriesMap.set(post.data.series.id, {
+        name: post.data.series.name,
+        description: post.data.series.description,
+      });
+    }
+  }
+
+  return Array.from(seriesMap.entries()).map(([seriesId, meta]) => ({
+    params: { seriesId },
+    props: {
+      name: meta.name,
+      description: meta.description,
+      posts: allPosts
+        .filter((p) => p.data.series?.id === seriesId)
+        .sort((a, b) => (a.data.series?.order ?? 0) - (b.data.series?.order ?? 0)),
+    },
+  }));
+}
+
+const { name, description, posts } = Astro.props;
+const pageDescription = description ?? `${posts.length} part tutorial series`;
+---
+
+<EditorLayout title={name} description={pageDescription}>
+  <LineGutter>
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem;">
+        <a href="/blog" style="color: var(--ctp-blue); text-decoration: none; font-size: 13px;">← back to blog</a>
+      </div>
+      <h1
+        style="
+          color: var(--ctp-mauve);
+          font-size: 1.4rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        <span style="color: var(--ctp-peach);">⊞</span>
+        <span>{name}</span>
+        <span style="color: var(--ctp-overlay0); font-size: 1rem; font-weight: 400;">
+          — {posts.length} part{posts.length !== 1 ? 's' : ''}
+        </span>
+      </h1>
+
+      {description && (
+        <p style="color: var(--ctp-subtext0); font-size: 13px; margin-bottom: 1.5rem; border-left: 2px solid var(--ctp-blue); padding-left: 12px;">
+          {description}
+        </p>
+      )}
+
+      {posts.length === 0 ? (
+        <p style="color: var(--ctp-overlay0); font-size: 13px;">
+          No posts in this series.
+        </p>
+      ) : (
+        <ol style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+          {posts.map((post, i) => (
+            <li>
+              <a
+                href={`/blog/${post.id}`}
+                style="
+                  display: flex;
+                  align-items: baseline;
+                  gap: 12px;
+                  padding: 12px 16px;
+                  border-radius: 6px;
+                  border: 1px solid var(--ctp-surface0);
+                  text-decoration: none;
+                  transition: border-color 0.1s, background 0.1s;
+                "
+                class="post-card"
+              >
+                <span
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    font-size: 12px;
+                    font-weight: 600;
+                    flex-shrink: 0;
+                    background: var(--ctp-surface0);
+                    color: var(--ctp-blue);
+                  "
+                >
+                  {i + 1}
+                </span>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                    <span style="color: var(--ctp-text); font-size: 14px; font-weight: 500;">
+                      ✎ {post.data.title}
+                    </span>
+                    <span style="color: var(--ctp-overlay0); font-size: 12px; flex-shrink: 0;">
+                      {new Date(post.data.date).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                  {post.data.description && (
+                    <p style="color: var(--ctp-subtext0); font-size: 12px; margin-top: 4px; margin-bottom: 0;">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  </LineGutter>
+</EditorLayout>
+
+<style is:global>
+.post-card:hover {
+  border-color: var(--ctp-blue) !important;
+  background: var(--ctp-surface0) !important;
+}
+</style>

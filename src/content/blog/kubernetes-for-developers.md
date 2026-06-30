@@ -3,6 +3,11 @@ title: "Kubernetes for developers — from Compose to cluster"
 date: 2026-06-28
 description: "Bridge the gap from Docker Compose to Kubernetes: set up a local cluster with kind, translate Compose services into Deployments and Services, and learn the core objects you need every day."
 tags: ["kubernetes", "k8s", "cloud", "devops"]
+series:
+  id: from-go-api-to-kubernetes
+  name: "From Go API to Kubernetes"
+  order: 3
+  description: "A practical progression from building REST APIs in Go through containerization with Docker to orchestration with Kubernetes."
 draft: false
 ---
 
