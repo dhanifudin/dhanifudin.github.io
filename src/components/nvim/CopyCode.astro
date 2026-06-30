@@ -1,0 +1,86 @@
+<!--
+  CopyCode.astro — adds copy-to-clipboard buttons to all <pre> code blocks.
+  Lightweight client script, no framework dependency.
+  Does not execute in RSS/non-browser contexts.
+-->
+<script>
+{
+  function initCopyButtons() {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+
+    // aria-live region for screen reader announcements
+    const announcer = document.createElement('div');
+    announcer.id = 'copy-announcer';
+    announcer.setAttribute('aria-live', 'polite');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.className = 'sr-only';
+    announcer.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
+    document.body.appendChild(announcer);
+
+    const pres = prose.querySelectorAll('pre');
+    pres.forEach((pre, idx) => {
+      // Skip if already wrapped
+      if (pre.parentElement?.classList.contains('code-block-wrapper')) return;
+
+      // Wrap <pre> in a relative container
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      // Create button
+      const btn = document.createElement('button');
+      btn.className = 'copy-code-btn';
+      btn.setAttribute('aria-label', 'Copy code to clipboard');
+      btn.setAttribute('data-copy-idx', String(idx));
+      btn.innerHTML = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code');
+        const text = code?.textContent ?? pre.textContent ?? '';
+        try {
+          await navigator.clipboard.writeText(text);
+          // Success state
+          btn.classList.add('copied');
+          btn.setAttribute('aria-label', 'Copied');
+          btn.innerHTML = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          announcer.textContent = 'Code copied to clipboard';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.setAttribute('aria-label', 'Copy code to clipboard');
+            btn.innerHTML = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+          }, 2000);
+        } catch {
+          // Fallback for older browsers
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;left:-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          btn.classList.add('copied');
+          btn.setAttribute('aria-label', 'Copied');
+          btn.innerHTML = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          announcer.textContent = 'Code copied to clipboard';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.setAttribute('aria-label', 'Copy code to clipboard');
+            btn.innerHTML = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+          }, 2000);
+        }
+      });
+
+      wrapper.appendChild(btn);
+    });
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCopyButtons);
+  } else {
+    initCopyButtons();
+  }
+}
+</script>
