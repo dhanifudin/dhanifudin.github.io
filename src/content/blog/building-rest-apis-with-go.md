@@ -3,6 +3,11 @@ title: "Building REST APIs with Go — from net/http to structured handlers"
 date: 2026-06-29
 description: "Build a complete REST API in Go: start with the standard library, add routing with chi, structure your JSON handlers, wire up CRUD with an in-memory store, layer on middleware, and test everything with table-driven tests."
 tags: ["go", "backend", "rest", "api"]
+series:
+  id: from-go-api-to-kubernetes
+  name: "From Go API to Kubernetes"
+  order: 1
+  description: "A practical progression from building REST APIs in Go through containerization with Docker to orchestration with Kubernetes."
 draft: false
 ---
 

@@ -1,0 +1,175 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  series: {
+    id: string;
+    name: string;
+    order: number;
+    description?: string;
+  };
+  currentPostId: string;
+}
+
+const { series, currentPostId } = Astro.props;
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft && data.series?.id === series.id);
+const seriesPosts = allPosts.sort((a, b) => (a.data.series?.order ?? 0) - (b.data.series?.order ?? 0));
+
+const total = seriesPosts.length;
+const currentIndex = seriesPosts.findIndex(p => p.id === currentPostId);
+const prev = currentIndex > 0 ? seriesPosts[currentIndex - 1] : null;
+const next = currentIndex < total - 1 ? seriesPosts[currentIndex + 1] : null;
+---
+
+<div
+  class="series-nav"
+  style="
+    padding: 14px 16px;
+    border: 1px solid var(--ctp-surface0);
+    border-radius: 8px;
+    background: var(--ctp-mantle);
+    margin-bottom: 1.5rem;
+  "
+>
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+    <a
+      href={`/series/${series.id}`}
+      style="
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ctp-peach);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+      "
+      class="series-name-link"
+    >
+      <span>⊞</span>
+      <span>{series.name}</span>
+    </a>
+    <span style="color: var(--ctp-overlay0); font-size: 12px;">
+      Part {currentIndex + 1} of {total}
+    </span>
+  </div>
+
+  {series.description && (
+    <p style="color: var(--ctp-subtext0); font-size: 12px; margin-top: 6px; margin-bottom: 0;">
+      {series.description}
+    </p>
+  )}
+
+  <div
+    style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--ctp-surface0);
+    "
+    class="series-nav-links"
+  >
+    {prev ? (
+      <a href={`/blog/${prev.id}`} class="series-nav-link">
+        <span class="series-nav-arrow">← Previous</span>
+        <span class="series-nav-title">{prev.data.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+    {next ? (
+      <a href={`/blog/${next.id}`} class="series-nav-link series-nav-next">
+        <span class="series-nav-arrow">Next →</span>
+        <span class="series-nav-title">{next.data.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+  </div>
+
+  <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ctp-surface0);">
+    {seriesPosts.map((p, i) => (
+      <a
+        href={`/blog/${p.id}`}
+        class="series-step"
+        style="
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 10px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 13px;
+          transition: background 0.1s;
+          color: var(--ctp-subtext1);
+        "
+      >
+        <span
+          style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+            background: var(--ctp-surface0);
+            color: var(--ctp-overlay0);
+          "
+        >
+          {i + 1}
+        </span>
+        <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {p.data.title}
+        </span>
+        {p.id === currentPostId && (
+          <span style="color: var(--ctp-blue); font-size: 11px; flex-shrink: 0;">◀ you are here</span>
+        )}
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .series-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border: 1px solid var(--ctp-surface0);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: border-color 0.1s, background 0.1s;
+  }
+  .series-nav-link:hover {
+    border-color: var(--ctp-blue);
+    background: var(--ctp-surface0);
+  }
+  .series-nav-next {
+    text-align: right;
+  }
+  .series-nav-title {
+    color: var(--ctp-text);
+    font-size: 13px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .series-nav-arrow {
+    color: var(--ctp-overlay0);
+    font-size: 12px;
+  }
+  .series-step:hover {
+    background: var(--ctp-surface0);
+  }
+  .series-name-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

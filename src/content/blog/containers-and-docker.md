@@ -3,6 +3,11 @@ title: "Containers and Docker — a practical primer for developers"
 date: 2026-06-28
 description: "From zero to a working Dockerized service with Compose: what containers solve, how Docker works, and the patterns that keep your images lean and secure."
 tags: ["docker", "containers", "cloud", "devops"]
+series:
+  id: from-go-api-to-kubernetes
+  name: "From Go API to Kubernetes"
+  order: 2
+  description: "A practical progression from building REST APIs in Go through containerization with Docker to orchestration with Kubernetes."
 draft: false
 ---
 

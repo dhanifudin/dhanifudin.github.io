@@ -8,6 +8,24 @@ const allPosts = await getCollection('blog', ({ data }) => !data.draft);
 const posts = allPosts.sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
+
+const seriesMap = new Map<string, {
+  id: string;
+  name: string;
+  description?: string;
+  posts: typeof posts;
+}>();
+for (const post of posts) {
+  if (post.data.series) {
+    const s = post.data.series;
+    if (!seriesMap.has(s.id)) {
+      seriesMap.set(s.id, { id: s.id, name: s.name, description: s.description, posts: [] });
+    }
+    seriesMap.get(s.id)!.posts.push(post);
+  }
+}
+const seriesList = Array.from(seriesMap.values());
+seriesList.forEach(s => s.posts.sort((a, b) => (a.data.series?.order ?? 0) - (b.data.series?.order ?? 0)));
 ---
 
 <EditorLayout title="Blog" description="Writing by Dian Hanifudin Subhi">
@@ -30,6 +48,82 @@ const posts = allPosts.sort(
           — {posts.length} posts
         </span>
       </h1>
+
+      <!-- Series section -->
+      {seriesList.length > 0 && (
+        <div style="margin-bottom: 2rem;">
+          <h2
+            style="
+              color: var(--ctp-peach);
+              font-size: 1.1rem;
+              font-weight: 600;
+              margin-bottom: 1rem;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <span>⊞</span>
+            <span>series</span>
+            <span style="color: var(--ctp-overlay0); font-size: 0.85rem; font-weight: 400;">
+              — {seriesList.length} series
+            </span>
+          </h2>
+          {seriesList.map(series => (
+            <a
+              href={`/series/${series.id}`}
+              style="
+                display: block;
+                padding: 12px 16px;
+                border-radius: 6px;
+                border: 1px solid var(--ctp-surface0);
+                text-decoration: none;
+                transition: border-color 0.1s, background 0.1s;
+                margin-bottom: 0.75rem;
+              "
+              class="post-card"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="color: var(--ctp-peach); font-size: 14px; font-weight: 600;">
+                  ⊞ {series.name}
+                </span>
+                <span style="color: var(--ctp-overlay0); font-size: 12px; flex-shrink: 0;">
+                  {series.posts.length} part{series.posts.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              {series.description && (
+                <p style="color: var(--ctp-subtext0); font-size: 12px; margin-top: 4px; margin-bottom: 6px;">
+                  {series.description}
+                </p>
+              )}
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                {series.posts.map(p => (
+                  <span
+                    style="padding: 1px 8px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-overlay0);"
+                  >
+                    {p.data.series?.order}. {p.data.title.length > 35 ? p.data.title.slice(0, 35) + '…' : p.data.title}
+                  </span>
+                ))}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <h2
+        style="
+          color: var(--ctp-text);
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        <span>✎</span>
+        <span>all posts</span>
+      </h2>
 
       {posts.length === 0 ? (
         <p style="color: var(--ctp-overlay0); font-size: 13px;">
@@ -64,19 +158,26 @@ const posts = allPosts.sort(
                     {post.data.description}
                   </p>
                 )}
-                {post.data.tags.length > 0 && (
-                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;">
-                    {post.data.tags.map(tag => (
-                      <a
-                        href={`/tags/${slugify(tag)}`}
-                        style="padding: 1px 8px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-blue); text-decoration: none;"
-                        class="tag-badge"
-                      >
-                        {tag}
-                      </a>
-                    ))}
-                  </div>
-                )}
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; align-items: center;">
+                  {post.data.series && (
+                    <a
+                      href={`/series/${post.data.series.id}`}
+                      style="padding: 1px 8px; background: var(--ctp-peach); border-radius: 999px; font-size: 11px; color: var(--ctp-base); text-decoration: none; font-weight: 500;"
+                      class="series-badge"
+                    >
+                      {post.data.series.name}
+                    </a>
+                  )}
+                  {post.data.tags.map(tag => (
+                    <a
+                      href={`/tags/${slugify(tag)}`}
+                      style="padding: 1px 8px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-blue); text-decoration: none;"
+                      class="tag-badge"
+                    >
+                      {tag}
+                    </a>
+                  ))}
+                </div>
               </a>
             </li>
           ))}
@@ -93,5 +194,8 @@ const posts = allPosts.sort(
 }
 .tag-badge:hover {
   background: var(--ctp-surface1) !important;
+}
+.series-badge:hover {
+  opacity: 0.85;
 }
 </style>
