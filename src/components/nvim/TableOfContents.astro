@@ -1,0 +1,188 @@
+---
+/**
+ * TableOfContents.astro — renders a nested list of H2/H3 headings.
+ *
+ * - Links point to heading #id anchors that Astro auto-generates.
+ * - Hidden when fewer than 3 headings exist.
+ * - IntersectionObserver highlights the current section on scroll.
+ */
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+const visible = headings.filter(h => h.depth === 2 || h.depth === 3);
+if (visible.length < 3) return;
+---
+
+<nav class="toc-sidebar" aria-label="Table of Contents">
+  <div class="toc-header">On this page</div>
+  <ul class="toc-list">
+    {visible.map(heading => (
+      <li class={`toc-item toc-d${heading.depth}`}>
+        <a href={`#${heading.slug}`} data-toc-link data-heading={heading.slug}>
+          {heading.text}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .toc-sidebar {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding-top: 0.25rem;
+    border-left: 1px solid var(--ctp-surface0);
+    padding-left: 1rem;
+  }
+
+  .toc-header {
+    font-weight: 600;
+    color: var(--ctp-mauve);
+    margin-bottom: 0.75rem;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item a {
+    display: block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    color: var(--ctp-overlay0);
+    text-decoration: none;
+    line-height: 1.5;
+    border-left: 2px solid transparent;
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toc-item a:hover {
+    color: var(--ctp-text);
+    background: var(--ctp-surface0);
+  }
+
+  .toc-item a.active {
+    color: var(--ctp-blue);
+    border-left-color: var(--ctp-blue);
+    background: var(--ctp-surface0);
+  }
+
+  .toc-d3 a {
+    padding-left: 22px;
+    font-size: 11px;
+    color: var(--ctp-overlay1);
+  }
+
+  .toc-d3 a.active {
+    color: var(--ctp-blue);
+  }
+
+  @media (max-width: 768px) {
+    .toc-sidebar {
+      border-left: none;
+      padding-left: 0;
+      padding-top: 0;
+      border-bottom: 1px solid var(--ctp-surface0);
+      padding-bottom: 0.75rem;
+    }
+
+    .toc-header {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .toc-item a {
+      padding: 2px 8px;
+      border-left: none;
+      background: var(--ctp-surface0);
+      font-size: 11px;
+      white-space: normal;
+    }
+
+    .toc-item a.active {
+      background: var(--ctp-blue);
+      color: var(--ctp-base);
+    }
+
+    .toc-d3 a {
+      padding-left: 8px;
+    }
+
+    .toc-d3 a.active {
+      color: var(--ctp-base);
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    function init() {
+      const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+      if (links.length === 0) return;
+
+      const targets = new Map<string, HTMLAnchorElement>();
+      const els: Element[] = [];
+
+      links.forEach(link => {
+        const id = link.getAttribute('data-heading');
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (el) {
+          targets.set(id, link);
+          els.push(el);
+        }
+      });
+
+      if (els.length === 0) return;
+
+      const root = document.getElementById('editor-pane');
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              links.forEach(l => l.classList.remove('active'));
+              const match = targets.get(entry.target.id);
+              if (match) match.classList.add('active');
+            }
+          });
+        },
+        {
+          root,
+          rootMargin: '-10px 0px -70% 0px',
+          threshold: 0,
+        },
+      );
+
+      els.forEach(el => observer.observe(el));
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

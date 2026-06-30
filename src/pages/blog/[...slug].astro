@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
+import TableOfContents from '../../components/nvim/TableOfContents.astro';
 import { slugify } from '../../utils/slugify';
 
 export async function getStaticPaths() {
@@ -13,20 +14,20 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
 ---
 
 <EditorLayout title={post.data.title} description={post.data.description} ogType="article">
-  <LineGutter>
-    <article class="prose">
-      <!-- File info header (buffer modeline style) -->
+  <div class="blog-grid">
+    <!-- Post header -->
+    <div class="blog-header">
       <div
         style="
           display: flex;
           align-items: center;
           gap: 12px;
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.5rem;
           padding-bottom: 0.75rem;
           border-bottom: 1px solid var(--ctp-surface0);
           font-size: 12px;
@@ -41,7 +42,9 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
         </span>
       </div>
 
-      <h1>{post.data.title}</h1>
+      <h1 style="color: var(--ctp-mauve); font-size: 1.6rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 1.5rem;">
+        {post.data.title}
+      </h1>
 
       {post.data.description && (
         <p style="color: var(--ctp-subtext0); font-size: 13px; margin-bottom: 1.5rem; border-left: 2px solid var(--ctp-blue); padding-left: 12px;">
@@ -50,7 +53,7 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
       )}
 
       {post.data.tags.length > 0 && (
-        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem;">
           {post.data.tags.map(tag => (
             <a
               href={`/tags/${slugify(tag)}`}
@@ -62,29 +65,82 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
           ))}
         </div>
       )}
+    </div>
 
-      <Content />
+    <!-- Table of contents: between header and content in DOM (mobile natural position) -->
+    <div class="blog-toc">
+      <TableOfContents headings={headings} />
+    </div>
 
-      <!-- Footer nav -->
-      <div
-        style="
-          margin-top: 3rem;
-          padding-top: 1rem;
-          border-top: 1px solid var(--ctp-surface0);
-          display: flex;
-          justify-content: space-between;
-          font-size: 13px;
-        "
-      >
-        <a href="/blog" style="color: var(--ctp-blue); text-decoration: none;">← back to blog</a>
-        <a href="#" onclick="window.scrollTo(0,0);return false;" style="color: var(--ctp-overlay0); text-decoration: none;">↑ top</a>
-      </div>
-    </article>
-  </LineGutter>
+    <!-- Post body -->
+    <div class="blog-body">
+      <LineGutter>
+        <article class="prose">
+          <Content />
+
+          <!-- Footer nav -->
+          <div
+            style="
+              margin-top: 3rem;
+              padding-top: 1rem;
+              border-top: 1px solid var(--ctp-surface0);
+              display: flex;
+              justify-content: space-between;
+              font-size: 13px;
+            "
+          >
+            <a href="/blog" style="color: var(--ctp-blue); text-decoration: none;">← back to blog</a>
+            <a href="#" onclick="window.scrollTo(0,0);return false;" style="color: var(--ctp-overlay0); text-decoration: none;">↑ top</a>
+          </div>
+        </article>
+      </LineGutter>
+    </div>
+  </div>
 </EditorLayout>
 
+<style>
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    grid-template-rows: auto 1fr;
+    gap: 0 2rem;
+  }
+
+  .blog-header { grid-column: 1; grid-row: 1; }
+  .blog-body   { grid-column: 1; grid-row: 2; min-width: 0; }
+  .blog-toc    {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    position: sticky;
+    top: 1.25rem;
+    align-self: start;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+
+  /* Hide the top margin of the first content heading so it aligns with TOC */
+  .prose > :first-child {
+    margin-top: 0;
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .blog-toc {
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+      margin-bottom: 1.25rem;
+    }
+  }
+</style>
+
 <style is:global>
-.tag-badge:hover {
-  background: var(--ctp-surface1) !important;
-}
+  .tag-badge:hover {
+    background: var(--ctp-surface1) !important;
+  }
 </style>
