@@ -4,6 +4,7 @@ import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
 import TableOfContents from '../../components/nvim/TableOfContents.astro';
 import { slugify } from '../../utils/slugify';
+import { getAdjacentPosts } from '../../utils/postNav';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -16,6 +17,12 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+const { prev, next } = getAdjacentPosts(sortedPosts, post.id);
 ---
 
 <EditorLayout title={post.data.title} description={post.data.description} ogType="article">
@@ -78,10 +85,39 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
         <article class="prose">
           <Content />
 
+          <!-- Prev/Next navigation -->
+          {(prev || next) && (
+            <nav
+              class="post-nav"
+              style="
+                margin-top: 3rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--ctp-surface0);
+              "
+            >
+              {prev ? (
+                <a href={`/blog/${prev.id}`} class="post-nav-link">
+                  <span class="post-nav-arrow">← Previous</span>
+                  <span class="post-nav-title">{prev.data.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+              {next ? (
+                <a href={`/blog/${next.id}`} class="post-nav-link post-nav-next">
+                  <span class="post-nav-arrow">Next →</span>
+                  <span class="post-nav-title">{next.data.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+
           <!-- Footer nav -->
           <div
             style="
-              margin-top: 3rem;
+              margin-top: 1.5rem;
               padding-top: 1rem;
               border-top: 1px solid var(--ctp-surface0);
               display: flex;
@@ -123,6 +159,43 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
     margin-top: 0;
   }
 
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px;
+    border: 1px solid var(--ctp-surface0);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: border-color 0.1s, background 0.1s;
+  }
+
+  .post-nav-link:hover {
+    border-color: var(--ctp-blue);
+    background: var(--ctp-surface0);
+  }
+
+  .post-nav-next {
+    text-align: right;
+  }
+
+  .post-nav-title {
+    color: var(--ctp-text);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .post-nav-arrow {
+    color: var(--ctp-overlay0);
+    font-size: 12px;
+  }
+
   @media (max-width: 768px) {
     .blog-grid {
       display: flex;
@@ -135,6 +208,14 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
       max-height: none;
       overflow-y: visible;
       margin-bottom: 1.25rem;
+    }
+
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .post-nav-next {
+      text-align: left;
     }
   }
 </style>
