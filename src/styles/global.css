@@ -143,6 +143,7 @@ html[data-theme="mocha"] .shiki span {
 /* ─── Editor primitives ──────────────────────────────────────────────────────── */
 .editor-gutter {
   display: flex;
+  align-items: flex-start;
   gap: 0.75rem;
   line-height: 1.65;
 }

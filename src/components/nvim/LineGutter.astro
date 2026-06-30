@@ -45,19 +45,36 @@ const { lines = 60, cursorLine = 1 } = Astro.props;
   // Update line numbers dynamically based on actual rendered content height
   (function() {
     const gutter = document.getElementById('gutter-numbers');
-    const content = document.querySelector('[data-gutter] .content-col') as HTMLElement;
+    const content = document.querySelector('[data-gutter] .content-col');
     if (!gutter || !content) return;
 
+    let updating = false;
+
     function update() {
-      const lineH = parseFloat(getComputedStyle(content).lineHeight) || 23;
-      const total = Math.ceil(content.scrollHeight / lineH) + 5;
+      if (updating) return;
+      updating = true;
+
+      const firstLn = gutter.firstElementChild;
+      const lineH = firstLn ? firstLn.getBoundingClientRect().height : 23;
+      if (lineH <= 0) { updating = false; return; }
+
+      const target = Math.ceil(content.scrollHeight / lineH);
       const current = gutter.children.length;
-      for (let i = current + 1; i <= total; i++) {
-        const div = document.createElement('div');
-        div.className = 'ln';
-        div.textContent = String(i - 1); // relative
-        gutter.appendChild(div);
+
+      if (target > current) {
+        for (let i = current; i < target; i++) {
+          const div = document.createElement('div');
+          div.className = 'ln';
+          div.textContent = String(i + 1);
+          gutter.appendChild(div);
+        }
+      } else if (target < current) {
+        while (gutter.children.length > target) {
+          gutter.removeChild(gutter.lastElementChild as Element);
+        }
       }
+
+      updating = false;
     }
 
     update();
