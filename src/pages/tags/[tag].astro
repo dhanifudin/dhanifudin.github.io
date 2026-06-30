@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
 import { slugify } from '../../utils/slugify';
+import { formatReadingTime } from '../../utils/readingTime';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -81,8 +82,9 @@ const pageDescription = `${posts.length} post${posts.length !== 1 ? 's' : ''} ta
                   <span style="color: var(--ctp-text); font-size: 14px; font-weight: 500;">
                     ✎ {post.data.title}
                   </span>
-                  <span style="color: var(--ctp-overlay0); font-size: 12px; flex-shrink: 0;">
-                    {new Date(post.data.date).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  <span style="display: flex; gap: 10px; align-items: center; color: var(--ctp-overlay0); font-size: 12px; flex-shrink: 0;">
+                    <span>{new Date(post.data.date).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                    <span>{formatReadingTime(post.body)}</span>
                   </span>
                 </div>
                 {post.data.description && (
