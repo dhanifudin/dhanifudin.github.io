@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
+import { slugify } from '../../utils/slugify';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -51,9 +52,13 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
       {post.data.tags.length > 0 && (
         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem;">
           {post.data.tags.map(tag => (
-            <span style="padding: 2px 10px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-blue);">
+            <a
+              href={`/tags/${slugify(tag)}`}
+              style="padding: 2px 10px; background: var(--ctp-surface0); border-radius: 999px; font-size: 11px; color: var(--ctp-blue); text-decoration: none;"
+              class="tag-badge"
+            >
               #{tag}
-            </span>
+            </a>
           ))}
         </div>
       )}
@@ -77,3 +82,9 @@ const readingTime = Math.ceil(post.body?.split(/\s+/).length / 200);
     </article>
   </LineGutter>
 </EditorLayout>
+
+<style is:global>
+.tag-badge:hover {
+  background: var(--ctp-surface1) !important;
+}
+</style>
