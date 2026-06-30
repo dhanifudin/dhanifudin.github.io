@@ -23,6 +23,7 @@ import BufferLine        from '../components/nvim/BufferLine.vue';
 import StatusLine        from '../components/nvim/StatusLine.vue';
 import WhichKey          from '../components/nvim/WhichKey.vue';
 import CommandPalette    from '../components/nvim/CommandPalette.vue';
+import CopyCode          from '../components/nvim/CopyCode.astro';
 
 interface Props {
   title?: string;
@@ -175,6 +176,9 @@ const projectMeta = allProjects
     currentPath={currentPath}
     pages={pages}
   />
+
+  <!-- ── Copy code buttons ──────────────────────────────────────────────── -->
+  <CopyCode />
 </body>
 </html>
 

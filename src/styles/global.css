@@ -205,6 +205,46 @@ html[data-theme="mocha"] .shiki span {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ─── Code block copy button ─────────────────────────────────────────────────── */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.code-block-wrapper pre {
+  margin-bottom: 0;
+  padding-right: 3rem; /* space for the button */
+}
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--ctp-surface0);
+  border-radius: 4px;
+  background: var(--ctp-mantle);
+  color: var(--ctp-blue);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+  z-index: 1;
+}
+.code-block-wrapper:hover .copy-code-btn,
+.copy-code-btn:focus-visible {
+  opacity: 1;
+}
+.copy-code-btn:hover {
+  background: var(--ctp-surface0);
+  color: var(--ctp-text);
+}
+.copy-code-btn.copied {
+  color: var(--ctp-green);
+  border-color: var(--ctp-green);
+}
+
 /* ─── Focus ring (keyboard navigation) ──────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--ctp-blue);
