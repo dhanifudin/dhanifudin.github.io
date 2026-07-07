@@ -104,6 +104,14 @@ const projectMeta = allProjects
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="alternate" type="application/rss+xml" title="Dian Hanifudin Subhi — Blog" href="/rss.xml" />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#eff1f5" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1e1e2e" />
+  <link rel="apple-touch-icon" href="/pwa-icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
 
 <body
@@ -179,6 +187,15 @@ const projectMeta = allProjects
 
   <!-- ── Copy code buttons ──────────────────────────────────────────────── -->
   <CopyCode />
+
+  <!-- ── Service Worker registration (non-blocking) ──────────────────────── -->
+  <script is:inline>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
 </body>
 </html>
 
