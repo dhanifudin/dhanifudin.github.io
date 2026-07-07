@@ -1,0 +1,129 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { RelatedPostEntry } from '../../utils/relatedPosts';
+
+interface Props {
+  relatedPosts: RelatedPostEntry[];
+}
+
+const { relatedPosts } = Astro.props;
+const hasRelated = relatedPosts.length > 0;
+---
+
+{hasRelated && (
+  <section
+    class="related-section"
+    style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--ctp-surface0);"
+  >
+    <h2 style="
+      color: var(--ctp-mauve);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    ">
+      see also
+    </h2>
+
+    <div class="related-grid">
+      {relatedPosts.map((entry) => {
+        const { post, matchedBy, matchedTags } = entry;
+        const date = new Date(post.data.date).toLocaleDateString('en', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+
+        return (
+          <a
+            href={`/blog/${post.id}`}
+            class="related-card"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+              padding: 10px 14px;
+              border: 1px solid var(--ctp-surface0);
+              border-radius: 6px;
+              text-decoration: none;
+              transition: border-color 0.1s, background 0.1s;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              {matchedBy === 'series' && post.data.series && (
+                <span
+                  style="
+                    padding: 1px 8px;
+                    background: var(--ctp-mauve);
+                    color: var(--ctp-base);
+                    border-radius: 3px;
+                    font-size: 10px;
+                    font-weight: 500;
+                  "
+                >
+                  {post.data.series.name}
+                </span>
+              )}
+              {matchedBy === 'tags' && matchedTags && matchedTags.length > 0 && (
+                <span class="matched-tags">
+                  {matchedTags.slice(0, 2).map((t) => `#${t}`).join(' ')}
+                </span>
+              )}
+              <span style="font-size: 11px; color: var(--ctp-overlay0); margin-left: auto;">
+                {date}
+              </span>
+            </div>
+
+            <span
+              style="
+                color: var(--ctp-text);
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1.4;
+              "
+            >
+              {post.data.title}
+            </span>
+
+            {post.data.description && (
+              <span style="
+                color: var(--ctp-subtext0);
+                font-size: 11px;
+                line-height: 1.5;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+              ">
+                {post.data.description}
+              </span>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .related-card:hover {
+    border-color: var(--ctp-blue);
+    background: var(--ctp-surface0);
+  }
+
+  .matched-tags {
+    font-size: 10px;
+    color: var(--ctp-blue);
+  }
+
+  @media (max-width: 768px) {
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
