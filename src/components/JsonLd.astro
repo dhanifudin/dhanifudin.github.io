@@ -1,0 +1,10 @@
+---
+interface Props {
+  data: Record<string, unknown>;
+}
+
+const { data } = Astro.props;
+const content = JSON.stringify(data);
+---
+
+<Fragment set:html={`<script type="application/ld+json">${content}</script>`} />

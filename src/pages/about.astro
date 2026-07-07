@@ -1,9 +1,14 @@
 ---
 import EditorLayout from '../layouts/EditorLayout.astro';
 import LineGutter from '../components/nvim/LineGutter.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { createPersonJsonLd } from '../utils/jsonld';
+
+const personJsonLd = createPersonJsonLd();
 ---
 
 <EditorLayout title="About" description="About Dian Hanifudin Subhi">
+  <JsonLd data={personJsonLd} />
   <LineGutter>
     <article class="prose">
       <h1>About</h1>

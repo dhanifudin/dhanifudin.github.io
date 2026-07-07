@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import LineGutter from '../../components/nvim/LineGutter.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { createSoftwareApplicationJsonLd } from '../../utils/jsonld';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -13,9 +15,11 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const projectJsonLd = createSoftwareApplicationJsonLd(project, project.id);
 ---
 
 <EditorLayout title={project.data.title} description={project.data.description}>
+  <JsonLd data={projectJsonLd} />
   <LineGutter>
     <article class="prose">
       <!-- File info header -->

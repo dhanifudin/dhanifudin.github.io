@@ -2,13 +2,17 @@
 import { getCollection } from 'astro:content';
 import EditorLayout from '../layouts/EditorLayout.astro';
 import Dashboard from '../components/nvim/Dashboard.vue';
+import JsonLd from '../components/JsonLd.astro';
+import { createPersonJsonLd } from '../utils/jsonld';
 
 const allPosts    = await getCollection('blog', ({ data }) => !data.draft).catch(() => []);
 const allProjects = await getCollection('projects').catch(() => []);
 const buildDate   = new Date().toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' });
+const personJsonLd = createPersonJsonLd();
 ---
 
 <EditorLayout title="Dashboard" description="Dian Hanifudin Subhi — Software Engineer personal site">
+  <JsonLd data={personJsonLd} />
   <Dashboard
     client:only="vue"
     buildDate={buildDate}
