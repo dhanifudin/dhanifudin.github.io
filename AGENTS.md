@@ -118,3 +118,29 @@ Do NOT hardcode hex colors.
 ### Verification after changes
 
 Run `npm run build` — this is what CI runs and it must succeed.
+
+### PWA / Offline support
+
+The site ships as an installable Progressive Web App.
+
+**Files:**
+- `public/manifest.json` — web app manifest (Catppuccin Latte colors, `display: standalone`)
+- `public/sw.js` — lightweight service worker (no dependencies)
+- `public/pwa-icon.svg` — PWA/apple-touch-icon (scalable SVG with "dh" monogram)
+
+**Service worker caching strategy:**
+| Request type | Strategy | Description |
+|---|---|---|
+| Navigation (HTML) | Network-first | Fresh content when online; cached fallback when offline |
+| Static assets (css, js, woff2, png, svg, ico, webp) | Cache-first | Hashed by Astro, immutable; instant reloads |
+| Other same-origin GET | Network-first | Falls back to cache if network unavailable |
+| Cross-origin / non-GET | Bypass | No caching |
+
+**Registration:** Inline script in `EditorLayout.astro` registers `/sw.js` on `window.load` — does not block first paint.
+
+**Icons:** The PWA icon (`public/pwa-icon.svg`) is a hand-crafted SVG. No build-time icon generation is needed. To update the icon, edit the SVG directly.
+
+**Testing offline:**
+1. `npm run build && npm run preview`
+2. Open DevTools → Application → Service Workers
+3. Check "Offline" and reload — cached pages should render
