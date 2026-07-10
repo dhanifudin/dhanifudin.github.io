@@ -155,6 +155,29 @@ const blogJsonLd = createBlogPostingJsonLd(post, post.id);
   </div>
 </EditorLayout>
 
+<script>
+  (function () {
+    function addAnchors() {
+      const prose = document.querySelector('.prose');
+      if (!prose) return;
+      const headings = prose.querySelectorAll('h2[id], h3[id]');
+      headings.forEach(h => {
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.className = 'heading-anchor';
+        a.setAttribute('aria-label', 'Link to this section');
+        a.textContent = '\u00A7';
+        h.appendChild(a);
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', addAnchors);
+    } else {
+      addAnchors();
+    }
+  })();
+</script>
+
 <style>
   .blog-grid {
     display: grid;
