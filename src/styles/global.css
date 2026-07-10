@@ -182,6 +182,27 @@ html[data-theme="mocha"] .shiki span {
 .prose h1 { color: var(--ctp-mauve);    font-size: 1.6rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 1.5rem; }
 .prose h2 { color: var(--ctp-blue);     font-size: 1.3rem; font-weight: 600; margin-bottom: 0.4rem; margin-top: 1.25rem; }
 .prose h3 { color: var(--ctp-sapphire); font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; margin-top: 1rem; }
+.prose h2 .heading-anchor,
+.prose h3 .heading-anchor {
+  color: var(--ctp-overlay0);
+  text-decoration: none;
+  font-size: 0.85em;
+  margin-left: 0.35em;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h2 .heading-anchor:focus-visible,
+.prose h3 .heading-anchor:focus-visible {
+  opacity: 1;
+}
+.prose h2 .heading-anchor:hover,
+.prose h3 .heading-anchor:hover,
+.prose h2 .heading-anchor:focus-visible,
+.prose h3 .heading-anchor:focus-visible {
+  color: var(--ctp-blue);
+}
 .prose p  { margin-bottom: 1rem; }
 .prose a  { color: var(--ctp-blue); text-decoration: underline; text-underline-offset: 3px; }
 .prose a:hover { color: var(--ctp-lavender); }
