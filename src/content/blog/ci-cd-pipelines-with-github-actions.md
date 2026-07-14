@@ -6,7 +6,7 @@ tags: ["github-actions", "ci-cd", "devops", "cloud", "kubernetes"]
 series:
   id: from-go-api-to-kubernetes
   name: "From Go API to Kubernetes"
-  order: 4
+  order: 5
   description: "A practical progression from building REST APIs in Go through containerization with Docker to orchestration with Kubernetes."
 draft: false
 ---
