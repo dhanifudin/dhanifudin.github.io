@@ -23,12 +23,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -51,7 +51,7 @@ jobs:
         run: npm install -g opencode-ai@latest
 
       - name: Gather context and compose prompt
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           BUILD_EXIT_CODE: ${{ steps.build.outputs.exit_code }}
           FOCUS: ${{ github.event.inputs.focus || 'auto' }}
@@ -142,7 +142,7 @@ jobs:
           MODEL: ${{ vars.OPENCODE_RECOMMEND_MODEL || 'opencode-go/kimi-k2.7-code' }}
 
       - name: Create issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           FOCUS: ${{ github.event.inputs.focus || 'auto' }}
         with:
@@ -209,7 +209,7 @@ jobs:
 
       - name: Report workflow failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const { owner, repo } = context.repo
