@@ -37,7 +37,7 @@ function navigate(page: PageDef) {
       overflowX: 'auto',
       flexShrink: 0,
     }"
-    class="scrollbar-hide"
+    class="scrollbar-hide bufferline"
   >
     <!-- Tabs -->
     <button

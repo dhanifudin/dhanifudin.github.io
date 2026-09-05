@@ -31,6 +31,7 @@ export const pages: PageDef[] = [
   { key: 'a', leader: '<leader>ga', label: 'about',      path: '/about',     icon: '✎',  ft: 'markdown',  bufIdx: 2 },
   { key: 'b', leader: '<leader>gb', label: 'blog',       path: '/blog',      icon: '▤',  ft: 'directory', bufIdx: 3 },
   { key: 'p', leader: '<leader>gp', label: 'projects',   path: '/projects',  icon: '▣',  ft: 'directory', bufIdx: 4 },
+  { key: 'c', leader: '<leader>gc', label: 'cv',         path: '/cv',        icon: '⎙',  ft: 'pdf',       bufIdx: 5 },
 ];
 
 export interface Social {
@@ -63,6 +64,7 @@ export const whichKeyBindings: KeyBinding[] = [
       { type: 'action', key: 'a', icon: '✎', label: 'about' },
       { type: 'action', key: 'b', icon: '▤', label: 'blog' },
       { type: 'action', key: 'p', icon: '▣', label: 'projects' },
+      { type: 'action', key: 'c', icon: '⎙', label: 'cv' },
     ],
   },
   {
@@ -94,6 +96,7 @@ export const dashboardItems: DashboardItem[] = [
   { key: 'a', icon: '👤',  label: 'About Me',            action: 'navigate', target: '/about' },
   { key: 'b', icon: '▤',  label: 'Blog',                action: 'navigate', target: '/blog' },
   { key: 'p', icon: '▣',  label: 'Projects',            action: 'navigate', target: '/projects' },
+  { key: 'c', icon: '⎙',  label: 'Resume / CV',         action: 'navigate', target: '/cv' },
   { key: 'g', icon: '',  label: 'GitHub Profile',      action: 'external', target: 'https://github.com/dhanifudin' },
   { key: 'q', icon: '×',  label: 'Quit',                action: 'leader',   leaderAction: 'quit' },
 ];

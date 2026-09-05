@@ -205,4 +205,11 @@ const projectMeta = allProjects
     .neotree        { display: none !important; }
     .buffer-hints   { display: none !important; }
   }
+
+  /* Print: strip the Neovim chrome, print only the page content */
+  @media print {
+    .neotree, .bufferline, .statusline { display: none !important; }
+    body { height: auto !important; overflow: visible !important; background: #fff !important; }
+    #editor-pane { overflow: visible !important; padding: 0 !important; }
+  }
 </style>

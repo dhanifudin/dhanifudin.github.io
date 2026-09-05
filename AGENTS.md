@@ -109,10 +109,11 @@ Do NOT hardcode hex colors.
 | `Space g a` | Go to about |
 | `Space g b` | Go to blog |
 | `Space g p` | Go to projects |
+| `Space g c` | Go to CV |
 | `Space b n` | Next buffer |
 | `Space b p` | Previous buffer |
 | `Space t` | Toggle Catppuccin Latte ↔ Mocha |
-| `Space 1-4` | Go to buffer by index |
+| `Space 1-5` | Go to buffer by index |
 | `j` / `k` | Move in NeoTree (when sidebar focused) |
 
 ### Verification after changes

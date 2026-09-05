@@ -18,7 +18,7 @@ const _paletteOpen  = ref(false);
 const _neoTreeOpen  = ref(true);
 
 // ─── Page order for buffer cycling ────────────────────────────────────────────
-const PAGE_ORDER = ['/', '/about', '/blog', '/projects'] as const;
+const PAGE_ORDER = ['/', '/about', '/blog', '/projects', '/cv'] as const;
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 function go(path: string) {
@@ -84,6 +84,7 @@ export function handleLeaderKey(key: string) {
         case '2':  dismiss(); go('/about'); break;
         case '3':  dismiss(); go('/blog'); break;
         case '4':  dismiss(); go('/projects'); break;
+        case '5':  dismiss(); go('/cv'); break;
         default:   dismiss(); break;
       }
       break;
@@ -95,6 +96,7 @@ export function handleLeaderKey(key: string) {
         case 'a':      dismiss(); go('/about'); break;
         case 'b':      dismiss(); go('/blog'); break;
         case 'p':      dismiss(); go('/projects'); break;
+        case 'c':      dismiss(); go('/cv'); break;
         case 'Escape': dismiss(); break;
         default:       dismiss(); break;
       }

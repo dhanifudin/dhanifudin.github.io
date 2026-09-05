@@ -1,0 +1,266 @@
+---
+import EditorLayout from '../layouts/EditorLayout.astro';
+import LineGutter from '../components/nvim/LineGutter.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { createPersonJsonLd } from '../utils/jsonld';
+
+const personJsonLd = createPersonJsonLd();
+---
+
+<EditorLayout title="CV" description="Résumé / CV of Dian Hanifudin Subhi">
+  <JsonLd data={personJsonLd} />
+  <LineGutter>
+    <article class="prose">
+      <div class="cv-header">
+        <div>
+          <h1>Dian Hanifudin Subhi</h1>
+          <p class="cv-roles">Cloud &amp; DevOps Engineer &middot; Backend Developer &middot; Lecturer</p>
+          <p class="cv-contact">
+            Malang, East Java, Indonesia &middot;
+            <a href="https://wa.me/+6282230743546" target="_blank" rel="noopener">+62 822-3074-3546</a> &middot;
+            <a href="mailto:dhanifudin@gmail.com">dhanifudin@gmail.com</a> &middot;
+            <a href="https://www.linkedin.com/in/dhanifudin/" target="_blank" rel="noopener">linkedin.com/in/dhanifudin</a> &middot;
+            <a href="https://github.com/dhanifudin" target="_blank" rel="noopener">github.com/dhanifudin</a>
+          </p>
+        </div>
+        <button class="cv-print" type="button" data-print>⎙ Print / Save as PDF</button>
+      </div>
+
+      <h2>Summary</h2>
+      <p>
+        Cloud &amp; DevOps Engineer and university Lecturer. Operates production infrastructure on AWS,
+        Google Cloud, and Alibaba Cloud, including high-availability database clusters, CI/CD pipelines,
+        Docker-based deployment, and observability with Prometheus, Grafana, and New Relic. Builds backend
+        and full-stack applications with Node.js, React, MongoDB, PostgreSQL, PHP, and Java. Engages as a
+        lecturer, curriculum designer, and technical mentor, teaching Cloud Computing, Web Programming, and
+        Software Quality Assurance at Politeknik Negeri Malang and facilitating backend engineering
+        curricula at Dicoding Indonesia. Certified by Google Cloud, Alibaba Cloud, and Certiport.
+      </p>
+
+      <h2>Technical Skills</h2>
+      <ul>
+        <li>
+          <strong>Cloud &amp; DevOps:</strong> AWS, Google Cloud Platform, Alibaba Cloud, Linux, Docker,
+          CI/CD, GitHub Actions, GitLab CI, High-Availability Architecture, Prometheus, Grafana, New Relic
+          (production operations since 2017; taught in the Cloud Computing and Operating System courses)
+        </li>
+        <li>
+          <strong>Full-Stack / MERN:</strong> Node.js, Express, React, MongoDB, REST API Design, Rate
+          Limiting (Dicoding backend curriculum; KADA capstone; taught in the Web Programming course)
+        </li>
+        <li>
+          <strong>Databases &amp; Messaging:</strong> PostgreSQL, MySQL, Redis, RabbitMQ, Database Cluster
+          Management, Replication, Query Optimization, Schema Design (PPDB Surabaya HA cluster; Dicoding
+          facilitation)
+        </li>
+        <li><strong>Other Backend Languages:</strong> PHP, Java</li>
+        <li>
+          <strong>Teaching &amp; Mentoring:</strong> Curriculum Design, Project-Based Learning, Technical
+          Mentoring, Autograding Systems, Hackathon Facilitation
+        </li>
+      </ul>
+
+      <h2>Work Experience</h2>
+
+      <h3>Cloud System Administrator, PT Nusantara Baskara Jaya</h3>
+      <p class="cv-dateloc">August 2017 &ndash; Present &middot; South Jakarta, Indonesia</p>
+      <ul>
+        <li>Manage cloud infrastructure across AWS, Google Cloud, and Cloud VPS for production systems</li>
+        <li>Work with development teams to plan infrastructure changes around deployment and scaling needs</li>
+      </ul>
+
+      <h3>Lecturer, Politeknik Negeri Malang</h3>
+      <p class="cv-dateloc">September 2015 &ndash; Present &middot; Malang City, Indonesia</p>
+      <ul>
+        <li>
+          Teach Fundamental Programming, Web Programming, Software Quality Assurance, Operating System,
+          Cloud Computing, and Mobile Programming
+        </li>
+        <li>Built an automated grading system that runs student code submissions through a CI/CD pipeline</li>
+        <li>Bring applied research into student capstone projects as part of Project-Based Learning</li>
+      </ul>
+
+      <h3>Backend Facilitator, Dicoding Indonesia</h3>
+      <p class="cv-dateloc">August 2023 &ndash; 2024 &middot; Indonesia</p>
+      <ul>
+        <li>Mentored developer-educators through intermediate and expert-level backend engineering curricula</li>
+        <li>
+          Guided participants on integrating PostgreSQL into backend applications, covering schema design,
+          query optimization, and ORM-based data access
+        </li>
+        <li>Taught Redis as a server-side caching layer for reducing database load</li>
+        <li>Covered RabbitMQ for asynchronous message queue architectures</li>
+        <li>
+          Walked through automated API testing with Postman, and backend security basics: authentication,
+          authorization, rate limiting
+        </li>
+      </ul>
+
+      <h3>DevOps Engineer, Logisly</h3>
+      <p class="cv-dateloc">January 2022 &ndash; August 2022 &middot; Jakarta, Indonesia</p>
+      <ul>
+        <li>Built and maintained CI/CD pipelines for testing and deployment</li>
+        <li>Managed staging environments for pre-deployment validation</li>
+        <li>Monitored system health and resolved infrastructure issues</li>
+        <li>Worked with development teams on DevOps practices for release cycles</li>
+      </ul>
+
+      <h3>Database Administrator, Institut Teknologi Sepuluh Nopember Surabaya</h3>
+      <p class="cv-dateloc">June 2010 &ndash; 2012 &middot; Surabaya, Indonesia</p>
+      <p>
+        Core database engineer on the PPDB Surabaya (Penerimaan Peserta Didik Baru) project, a city-wide
+        new student enrollment and admission system serving thousands of applicants across Surabaya in
+        real time.
+      </p>
+      <ul>
+        <li>
+          Designed and managed a high-availability master-master database cluster to avoid a single point
+          of failure during peak enrollment periods
+        </li>
+        <li>Built the student ranking and selection system, including scoring logic to rank applicants on multiple criteria</li>
+        <li>Worked with application developers on database schema design for the enrollment workflow</li>
+      </ul>
+
+      <h2>Selected Projects</h2>
+
+      <h3>BPMN System (2022)</h3>
+      <p>
+        Handled infrastructure provisioning, deployment pipeline, and database HA management for a BPMN
+        workflow platform. Also administered Apache Solr for enterprise search, including index management
+        and schema configuration.
+      </p>
+
+      <h3>Duniagames: Games News Portal and Digital Transaction (2018)</h3>
+      <p>
+        Migrated the platform to a modernized, high-availability infrastructure with a clustered database
+        backend for reliability and data integrity.
+      </p>
+
+      <h3>SIPATUH: Umrah System (2018)</h3>
+      <p>
+        Managed the national Umrah verification platform operated under the Indonesian Ministry of
+        Religious Affairs. Handled Linux server infrastructure and MySQL database management and
+        performance tuning for high-volume traffic.
+      </p>
+
+      <h3>Loop: News Portal and Digital Transaction System (2017)</h3>
+      <p>
+        Migrated the platform to a new infrastructure environment: end-to-end deployment pipeline plus an
+        HA database cluster, aimed at zero data loss.
+      </p>
+
+      <h3>PPDB Surabaya: City-Wide Student Enrollment &amp; Admission System (2010&ndash;2012)</h3>
+      <p>
+        Master-master database cluster and student ranking engine for Surabaya's city-wide enrollment
+        platform (see Database Administrator role above for details).
+      </p>
+
+      <h2>Education</h2>
+
+      <h3>Institut Teknologi Sepuluh Nopember Surabaya</h3>
+      <p class="cv-dateloc">Master's Degree in Informatics &middot; 2011 &ndash; 2015 &middot; CGPA: 3.50</p>
+      <p class="cv-dateloc">Bachelor's Degree in Informatics &middot; 2006 &ndash; 2010 &middot; CGPA: 3.43</p>
+
+      <h3>Non-Formal Education</h3>
+      <p><strong>Korea-ASEAN Digital Academy (KADA): Web Development Track</strong></p>
+      <p class="cv-dateloc">2026 &middot; Indonesia &middot; Certificate of Completion</p>
+      <ul>
+        <li>
+          Joint program by Indonesia's Komdigi/BPSDM and Korea's National IT Industry Promotion Agency
+          (NIPA)
+        </li>
+        <li>Curriculum: AI fundamentals and full-stack web development with React and MongoDB (MERN)</li>
+        <li>Capstone: full-stack web application built with React, MongoDB, and AI-assisted features</li>
+      </ul>
+
+      <h2>Certifications</h2>
+      <ul>
+        <li>
+          <a href="https://drive.google.com/file/d/1ZLUvOpKziUQx9YoYWwEYb1IEomkZhbX3/view?usp=sharing" target="_blank" rel="noopener">Certiport IT Specialist: Software Development</a> (2025)
+        </li>
+        <li>
+          <a href="https://drive.google.com/file/d/14VuGqgeBjB66fxDdrVphpe54gQS6Wo8E/view?usp=drive_link" target="_blank" rel="noopener">Google Associate Cloud Engineer</a> (2024)
+        </li>
+        <li>
+          <a href="https://drive.google.com/file/d/14iV2fzBvyWXXicfSPg31nZsRWafECMxV/view?usp=drive_link" target="_blank" rel="noopener">Google Cloud Digital Leader</a> (2022)
+        </li>
+        <li>
+          <a href="https://drive.google.com/file/d/1GFQX2b8gqEwJv8S_fosNNQu73jXvxanI/view?usp=drive_link" target="_blank" rel="noopener">Alibaba Cloud Associate Cloud Computing</a> (2021)
+        </li>
+        <li>
+          <a href="https://drive.google.com/file/d/1MVOZkEv-mUVpTCHqpCfveiUKt5VZbSda/view?usp=drive_link" target="_blank" rel="noopener">Alibaba Cloud Associate Cloud Security</a> (2021)
+        </li>
+      </ul>
+
+      <h2>Languages</h2>
+      <ul>
+        <li>Indonesian: Native</li>
+        <li>English: Conversational</li>
+      </ul>
+    </article>
+  </LineGutter>
+</EditorLayout>
+
+<style>
+  .cv-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+  .cv-header h1 { margin-top: 0; margin-bottom: 0.2rem; }
+  .cv-roles { color: var(--ctp-subtext1); margin-bottom: 0.3rem; }
+  .cv-contact { font-size: 0.85rem; color: var(--ctp-overlay1); margin-bottom: 0; }
+  .cv-dateloc { color: var(--ctp-overlay0); font-size: 0.85rem; margin-bottom: 0.4rem; }
+  .cv-print {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.45em 0.9em;
+    border: 1px solid var(--ctp-blue);
+    border-radius: 6px;
+    color: var(--ctp-blue);
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .cv-print:hover {
+    background: var(--ctp-blue);
+    color: var(--ctp-base);
+  }
+
+  /* ─── Print: plain black-on-white résumé, no editor chrome or line numbers ── */
+  @media print {
+    .cv-print { display: none !important; }
+    :global([data-gutter] .gutter-col) { display: none !important; }
+    article.prose {
+      color: #111 !important;
+      max-width: 100% !important;
+    }
+    article.prose :global(h1),
+    article.prose :global(h2),
+    article.prose :global(h3) {
+      color: #111 !important;
+    }
+    article.prose :global(a) {
+      color: #111 !important;
+      text-decoration: underline !important;
+    }
+    .cv-roles,
+    .cv-contact,
+    .cv-dateloc {
+      color: #444 !important;
+    }
+  }
+</style>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

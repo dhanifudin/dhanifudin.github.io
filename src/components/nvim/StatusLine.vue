@@ -62,6 +62,7 @@ onMounted(() => {
 
 <template>
   <footer
+    class="statusline"
     :style="{
       display: 'flex',
       alignItems: 'center',
