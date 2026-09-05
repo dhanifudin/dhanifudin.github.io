@@ -26,14 +26,14 @@ const rest      = projects.filter(p => !p.data.featured);
         <span>▣</span>
         <span>projects</span>
         <span style="color: var(--ctp-overlay0); font-size: 1rem; font-weight: 400;">
-          — {projects.length} projects
+          · {projects.length} projects
         </span>
       </h1>
 
       {featured.length > 0 && (
         <section style="margin-bottom: 2rem;">
           <h2 style="color: var(--ctp-blue); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 600;">
-            ⭐ Featured
+            ★ Featured
           </h2>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
             {featured.map(p => (

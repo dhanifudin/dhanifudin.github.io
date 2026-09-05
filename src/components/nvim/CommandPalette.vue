@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * CommandPalette.vue — Telescope-style fuzzy finder
+ * CommandPalette.vue: Telescope-style fuzzy finder
  *
  * Opens with <leader>f or clicking the find icon.
  * Fuzzy-searches pages + blog posts + projects.
@@ -298,7 +298,7 @@ function onKeyDown(e: KeyboardEvent) {
             gap: '6px',
           }"
         >
-          <span>🔍</span>
+          <span>/</span>
           <span>Telescope  ·  Find File</span>
         </div>
 

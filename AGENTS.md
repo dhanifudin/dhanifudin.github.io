@@ -28,9 +28,9 @@ Consult these guides before working on related tasks:
 ### Tech stack
 
 - **Astro 7** (static, no SSR adapter needed for GitHub Pages)
-- **Vue 3** with `<script setup lang="ts">` — all interactive widgets
+- **Vue 3** with `<script setup lang="ts">` for all interactive widgets
 - **Tailwind CSS v4** via `@tailwindcss/vite` (Vite plugin, not the old `@astrojs/tailwind`)
-- **@fontsource/fira-code** — monospace font imported in `src/styles/global.css`
+- **@fontsource/fira-code**: monospace font imported in `src/styles/global.css`
 - **Catppuccin** colors via CSS custom properties (see `src/styles/global.css`)
 - Content collections: `blog` and `projects` (defined in `src/content.config.ts`)
 
@@ -81,22 +81,37 @@ Do NOT hardcode hex colors.
 
 - Every interactive widget uses `client:only="vue"` (no SSR)
 - Import `useLeader` from `./useLeader` to read / act on keyboard state
-- Don't create new global keyboard handlers unless necessary — use `useLeader` instead
+- Don't create new global keyboard handlers unless necessary, use `useLeader` instead
 - Props passed from Astro must be JSON-serializable (no class instances, no functions)
 
 ### Single source of truth
 
 `src/data/site.ts` defines:
-- `pages` — drives NeoTree, BufferLine, WhichKey, CommandPalette, Dashboard
-- `socials` — drives Dashboard footer
-- `profile` — drives Dashboard header and StatusLine
+- `pages`: drives NeoTree, BufferLine, WhichKey, CommandPalette, Dashboard
+- `socials`: drives Dashboard footer
+- `profile`: drives Dashboard header and StatusLine
 
 **Never hardcode page lists or profile info in components.** Always import from `site.ts`.
 
 ### Content collections
 
-- Blog posts: `src/content/blog/*.{md,mdx}` — required frontmatter: `title`, `date`, `description`, `tags[]`, `draft`
-- Projects: `src/content/projects/*.{md,mdx}` — required: `title`, `description`, `tags[]`; optional: `url`, `repo`, `featured`, `order`
+- Blog posts: `src/content/blog/*.{md,mdx}`, required frontmatter: `title`, `date`, `description`, `tags[]`, `draft`
+- Projects: `src/content/projects/*.{md,mdx}`, required: `title`, `description`, `tags[]`; optional: `url`, `repo`, `featured`, `order`
+
+### Blog topics
+
+The Neovim look is a UI theme, not a content mandate. Blog posts are not limited to Neovim or
+Go: draw from the full topic streams in `src/data/topics.json` (cloud & DevOps, backend
+development, databases & messaging, web development, developer environment & CLI, teaching &
+mentoring, security). Rotate across streams rather than favoring one language or tool.
+
+### Writing style
+
+- **No em dash character (`—`).** Use a comma, colon, period, or a spaced hyphen ( - ) instead.
+- **No color emoji** (e.g. no 🔍, 👤, ⚡, ⭐, ✅, 🎉). They render inconsistently across operating
+  systems. Use plain Unicode text symbols instead, matching the vocabulary already used across the
+  site: `⌂ ✎ ▤ ▣ ◈ ⎙ ⊡ ★ ✓ / →  ← ↑ ↓ ↔ ↗`. Do not introduce Nerd Font private-use glyphs either;
+  no Nerd Font is loaded, so they render as blank boxes.
 
 ### Keyboard shortcuts
 
@@ -118,16 +133,16 @@ Do NOT hardcode hex colors.
 
 ### Verification after changes
 
-Run `npm run build` — this is what CI runs and it must succeed.
+Run `npm run build`: this is what CI runs and it must succeed.
 
 ### PWA / Offline support
 
 The site ships as an installable Progressive Web App.
 
 **Files:**
-- `public/manifest.json` — web app manifest (Catppuccin Latte colors, `display: standalone`)
-- `public/sw.js` — lightweight service worker (no dependencies)
-- `public/pwa-icon.svg` — PWA/apple-touch-icon (scalable SVG with "dh" monogram)
+- `public/manifest.json`: web app manifest (Catppuccin Latte colors, `display: standalone`)
+- `public/sw.js`: lightweight service worker (no dependencies)
+- `public/pwa-icon.svg`: PWA/apple-touch-icon (scalable SVG with "dh" monogram)
 
 **Service worker caching strategy:**
 | Request type | Strategy | Description |
@@ -137,11 +152,11 @@ The site ships as an installable Progressive Web App.
 | Other same-origin GET | Network-first | Falls back to cache if network unavailable |
 | Cross-origin / non-GET | Bypass | No caching |
 
-**Registration:** Inline script in `EditorLayout.astro` registers `/sw.js` on `window.load` — does not block first paint.
+**Registration:** Inline script in `EditorLayout.astro` registers `/sw.js` on `window.load`; does not block first paint.
 
 **Icons:** The PWA icon (`public/pwa-icon.svg`) is a hand-crafted SVG. No build-time icon generation is needed. To update the icon, edit the SVG directly.
 
 **Testing offline:**
 1. `npm run build && npm run preview`
 2. Open DevTools → Application → Service Workers
-3. Check "Offline" and reload — cached pages should render
+3. Check "Offline" and reload: cached pages should render

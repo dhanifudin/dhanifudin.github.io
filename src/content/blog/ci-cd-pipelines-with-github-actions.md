@@ -1,5 +1,5 @@
 ---
-title: "CI/CD pipelines with GitHub Actions — from git push to running pods"
+title: "CI/CD pipelines with GitHub Actions: from git push to running pods"
 date: 2026-07-07
 description: "Close the loop: automate Go API builds, Docker image pushes to GHCR, vulnerability scans with Trivy, and Kubernetes deployments with a single GitHub Actions workflow."
 tags: ["github-actions", "ci-cd", "devops", "cloud", "kubernetes"]
@@ -32,8 +32,8 @@ That's fine for exploration. It breaks down the moment more than one person touc
 the repo, or when you push at 11 PM and forget step 4, or when the image you built
 on your laptop has a different `libc` than the one that works in the cluster.
 
-**CI/CD** is the answer. It's the automated pipeline that runs on every push — builds,
-tests, scans, pushes, and deploys — so the only manual step left is `git push`. This
+**CI/CD** is the answer. It's the automated pipeline that runs on every push - builds,
+tests, scans, pushes, and deploys - so the only manual step left is `git push`. This
 tutorial builds that pipeline with GitHub Actions, the CI/CD system built into every
 GitHub repository, and connects it to the Go API + Docker + Kubernetes stack we've
 assembled across the series.
@@ -50,36 +50,36 @@ git push (main or PR)
 ┌─────────────┐
 │  Lint & Test │  ← catch regressions before anything else
 └──────┬──────┘
-       │ ✅
+       │ ✓
        ▼
 ┌─────────────┐
 │ Build image  │  ← compile the Go binary inside Docker
 └──────┬──────┘
-       │ ✅
+       │ ✓
        ▼
 ┌─────────────┐
 │ Scan image   │  ← check for known CVEs (Trivy)
 └──────┬──────┘
-       │ ✅
+       │ ✓
        ▼
 ┌─────────────┐
 │ Push to GHCR │  ← tag with commit SHA and `latest`
 └──────┬──────┘
-       │ ✅
+       │ ✓
        ▼
 ┌─────────────┐
 │ Deploy to K8s│  ← `kubectl set image` or `kubectl apply`
 └──────┬──────┘
-       │ ✅
+       │ ✓
        ▼
-   🎉 Running pods
+   ✓ Running pods
 ```
 
-The first two gates — lint/test and build — run on every push and every pull request.
+The first two gates, lint/test and build, run on every push and every pull request.
 The scan gate runs on push to main and on PRs. The push and deploy gates only run on
-pushes to main — you don't want every feature branch updating the cluster.
+pushes to main: you don't want every feature branch updating the cluster.
 
-This is sometimes called **CI/CD** semantics — _continuous integration_ (every push
+This is sometimes called **CI/CD** semantics: _continuous integration_ (every push
 is tested and merged) plus _continuous delivery_ (merged code is automatically
 deployed). Some teams add a manual approval gate before deploy (_continuous
 deployment_ vs _continuous delivery_), but for a personal project or staging
@@ -154,11 +154,11 @@ Key concepts:
 - **Job**: a group of steps that run on the same runner. Jobs are independent
   and parallel by default; you can chain them with `needs`.
 - **Step**: either a shell command (`run`) or a reusable action (`uses`).
-  Actions are the npm packages of CI/CD — community-maintained building blocks.
+  Actions are the npm packages of CI/CD: community-maintained building blocks.
 - **Runner**: the VM that executes jobs. `ubuntu-latest` is the most common choice,
   but `windows-latest` and `macos-latest` are available.
 
-For our pipeline, we'll define four jobs — test, build-and-push, scan, and deploy —
+For our pipeline, we'll define four jobs: test, build-and-push, scan, and deploy,
 with dependencies between them so nothing runs out of order.
 
 ## The complete workflow
@@ -316,13 +316,13 @@ jobs:
 
 ## Walkthrough: what each section does
 
-### Job 1 — Test
+### Job 1: Test
 
 The test job catches regressions before we spend cycles on a Docker build. It
 runs on every push to main and every pull request.
 
 `go mod verify` confirms that the module cache hasn't been tampered with.
-`go vet` is Go's static analyser — it catches things like unreachable code,
+`go vet` is Go's static analyser: it catches things like unreachable code,
 incorrect format strings, and suspicious constructs that the compiler doesn't
 flag. `go test -race -coverprofile=coverage.out ./...` runs all tests in all
 packages, enables the race detector (adds overhead but catches data races early),
@@ -332,18 +332,18 @@ The coverage artifact is uploaded on push events only. You can pull it into
 tools like [codecov](https://about.codecov.io/) or analyse it in PR comments
 with a coverage-diff action.
 
-### Job 2 — Build & Push
+### Job 2: Build & Push
 
 This job depends on `test` passing. If `go test` fails, the Docker build
-never starts — saving runner minutes and avoiding a broken image.
+never starts, saving runner minutes and avoiding a broken image.
 
 **Set up Docker Buildx** enables the BuildKit engine, which supports multi-platform
 builds, cache backends, and better layer caching. The `gha` cache type stores
 build layers in GitHub Actions' own cache, so subsequent builds only re-run
-the layers that changed — similar to how local `docker build` uses its layer
+the layers that changed, similar to how local `docker build` uses its layer
 cache, but shared across workflow runs.
 
-**Log in to GHCR** uses `secrets.GITHUB_TOKEN` — a token that GitHub generates
+**Log in to GHCR** uses `secrets.GITHUB_TOKEN`, a token that GitHub generates
 automatically for every workflow run. It has read/write access to the repository's
 packages but expires when the job finishes. No additional secret configuration
 is needed; the `packages: write` permission on the job is enough.
@@ -358,7 +358,7 @@ block produces:
 | `type=raw,value=latest` | `latest` | push to main only |
 
 This gives you three tags on every main push: `abc1234`, `main`, and `latest`.
-The short SHA is immutable — you can roll back to it weeks later. The `latest`
+The short SHA is immutable. You can roll back to it weeks later. The `latest`
 tag floats to the most recent image, which makes it convenient for deployment
 (no need to update a version string in your manifests).
 
@@ -369,7 +369,7 @@ not pushed. On push to main, it builds _and_ pushes. The `cache-from` and
 download layer and the `go build` layer only invalidate when their inputs
 change.
 
-### Job 3 — Scan
+### Job 3: Scan
 
 Scanning is the seatbelt between "image built" and "image deployed." Trivy
 is an open-source vulnerability scanner from Aqua Security that reads a container
@@ -387,18 +387,18 @@ If Trivy finds HIGH or CRITICAL vulnerabilities, the SARIF report is uploaded
 to the repository's **Security** tab, where you can triage and track them
 over time.
 
-Note that this job doesn't block deployment by default — it reports findings
+Note that this job doesn't block deployment by default: it reports findings
 to the Security tab without failing the pipeline. To make scanning a hard gate,
 add `exit-code: 1` and `severity: HIGH,CRITICAL` to the trivy-action inputs
 and remove `if: always()` from the upload step.
 
-### Job 4 — Deploy
+### Job 4: Deploy
 
 The deploy job wires the GitHub Actions runner to your Kubernetes cluster and
 updates the running `api` Deployment.
 
 **Configure kubectl** installs the `kubectl` CLI (v1.31). Pin the version to
-match your cluster's control plane — a version skew of ±1 minor is supported,
+match your cluster's control plane: a version skew of ±1 minor is supported,
 but matching exactly avoids surprises.
 
 **Set kubeconfig** decodes the `KUBE_CONFIG` secret and writes it to the
@@ -414,7 +414,7 @@ the change, visible in `kubectl rollout history`.
 **Verify rollout** waits up to 120 seconds for the rollout to complete. If the
 new Pods fail readiness probes or crash-loop, `kubectl rollout status` exits
 with a non-zero code, the job fails, and you get a notification. The `kubectl
-get pods` output gives you a snapshot of what's running — useful for debugging
+get pods` output gives you a snapshot of what's running, useful for debugging
 directly in the Actions log.
 
 ### Why `kubectl set image` and not `kubectl apply`
@@ -435,7 +435,7 @@ and running `kubectl apply`. Both work. The difference is:
   a commit-per-deploy in your Git history.
 
 For a small project, `kubectl set image` is the pragmatic choice. As you scale,
-the declarative path — codified by GitOps tools like Argo CD and Flux — becomes
+the declarative path - codified by GitOps tools like Argo CD and Flux - becomes
 the cleaner approach. See the GitOps section below.
 
 ## Creating secrets
@@ -443,7 +443,7 @@ the cleaner approach. See the GitOps section below.
 The workflow needs two secrets configured in your repository. Go to
 **Settings → Secrets and variables → Actions → New repository secret**.
 
-### `GITHUB_TOKEN` — no setup needed
+### `GITHUB_TOKEN`: no setup needed
 
 `secrets.GITHUB_TOKEN` is automatically injected by GitHub into every workflow
 run. You don't create it manually. It authenticates the workflow to GitHub's API
@@ -454,7 +454,7 @@ For this workflow, the build-and-push job declares `packages: write`, which
 allows pushing images to GHCR. The scan job adds `security-events: write` for
 uploading SARIF reports. No other secrets are needed for the registry.
 
-### `KUBE_CONFIG` — one manual secret
+### `KUBE_CONFIG`: one manual secret
 
 The `KUBE_CONFIG` secret contains the base64-encoded kubeconfig file for your
 cluster. Generate it from a machine that already has `kubectl` access:
@@ -464,7 +464,7 @@ cluster. Generate it from a machine that already has `kubectl` access:
 cat ~/.kube/config | base64 | tr -d '\n'
 ```
 
-Copy the entire output — it will be a long, single-line string — and paste it
+Copy the entire output - it will be a long, single-line string - and paste it
 as the value of the `KUBE_CONFIG` secret.
 
 **Important:** The kubeconfig embeds credentials (client certificate, token, or
@@ -474,7 +474,7 @@ periodically and update the secret.
 #### For kind clusters (local testing)
 
 If you're using a local kind cluster for development, the GitHub Actions runner
-can't reach it — `ubuntu-latest` runs in GitHub's cloud, not on your machine. For
+can't reach it: `ubuntu-latest` runs in GitHub's cloud, not on your machine. For
 local testing, you have two options:
 
 - **Install a self-hosted runner** on a machine inside your network that has
@@ -484,18 +484,18 @@ local testing, you have two options:
   Kubernetes) works and gives you a stable endpoint reachable from GitHub's
   runners.
 
-For this tutorial, we assume a cluster reachable from the internet — a managed
+For this tutorial, we assume a cluster reachable from the internet, a managed
 K8s service or a VPS running k3s with a public IP.
 
 ## Environments and deployment protection
 
-GitHub Actions supports **environments** — named deployment targets (e.g.
+GitHub Actions supports **environments**, named deployment targets (e.g.
 `staging`, `production`) with optional protection rules. Adding an environment
 to the deploy job gives you:
 
-- **Required reviewers** — one or more people must approve before the job runs.
-- **Wait timer** — a mandatory delay (e.g. 5 minutes) before deployment.
-- **Environment-specific secrets** — `KUBE_CONFIG` could be different for
+- **Required reviewers**: one or more people must approve before the job runs.
+- **Wait timer**: a mandatory delay (e.g. 5 minutes) before deployment.
+- **Environment-specific secrets**: `KUBE_CONFIG` could be different for
   `staging` and `production`.
 
 To add an environment, create it under **Settings → Environments**, then
@@ -506,7 +506,7 @@ deploy:
   environment: production
 ```
 
-This is optional for a personal project, but it's a good habit to set up — it
+This is optional for a personal project, but it's a good habit to set up: it
 costs nothing and prevents accidental deploys.
 
 ## Triggering on tags
@@ -539,7 +539,7 @@ get immutable, versioned deployments.
 
 `kubectl set image` from a CI runner is effective but it has a philosophical
 gap: the CI system has write access to both the image registry _and_ the
-cluster. In larger teams, the cluster is a separate trust domain — you want CI
+cluster. In larger teams, the cluster is a separate trust domain: you want CI
 to push images, but a different system to decide _when_ and _what_ to deploy.
 
 **GitOps** separates these concerns. The core idea:
@@ -581,8 +581,8 @@ and rolls it out.
 
 ### Flux
 
-Flux is the CNCF-graduated alternative. It takes the same approach — a
-controller inside the cluster that watches a Git repo — but adds automated
+Flux is the CNCF-graduated alternative. It takes the same approach - a
+controller inside the cluster that watches a Git repo - but adds automated
 image updates: Flux can watch a container registry, detect new tags, and
 commit the update back to the GitOps repo.
 
@@ -590,7 +590,7 @@ The advantage: you don't need a separate CI step to update manifests. Flux's
 image automation controller does it for you.
 
 Both Argo CD and Flux are beyond the scope of this single tutorial, but the
-pipeline we've built here — CI builds, tests, and pushes — is the first half
+pipeline we've built here - CI builds, tests, and pushes - is the first half
 of the GitOps equation. The second half is picking a controller and pointing
 it at a repo.
 
@@ -639,33 +639,33 @@ The new Pods aren't becoming ready. Common culprits:
 
 This tutorial closes the loop from `git push` to running Pods, completing the
 "From Go API to Kubernetes" series. The pipeline we built covers the essential
-gates — test, build, scan, deploy — and gives you a foundation to extend.
+gates - test, build, scan, deploy - and gives you a foundation to extend.
 
-- **Helm** — replace raw manifests with a Helm chart. Package the Go API, Postgres,
+- **Helm**: replace raw manifests with a Helm chart. Package the Go API, Postgres,
   and Redis into a single `values.yaml` with templated resources. Helm handles
   upgrades, rollbacks, and release history.
 
-- **GitOps with Argo CD or Flux** — decouple CI from CD. Let a controller inside
+- **GitOps with Argo CD or Flux**: decouple CI from CD. Let a controller inside
   the cluster watch your manifests repo and reconcile continuously. See the
   [GitOps section](#moving-toward-gitops) above for the architecture.
 
-- **Observability** — add Prometheus metrics to the Go API (via
+- **Observability**: add Prometheus metrics to the Go API (via
   [promhttp](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus/promhttp)),
   collect them with the Prometheus Operator, visualize with Grafana, and
   aggregate logs with Loki. The `kubectl logs` workflow step you added is a
   starting point; a full stack gives you dashboards and alerts.
 
-- **Multi-environment pipelines** — extend the workflow with a `staging` and
+- **Multi-environment pipelines**: extend the workflow with a `staging` and
   `production` environment. Use environment-specific secrets and a manual
   approval gate between them. The `environments` feature in GitHub Actions
   makes this straightforward.
 
-- **Infrastructure as Code** — if your Kubernetes cluster itself is defined
+- **Infrastructure as Code**: if your Kubernetes cluster itself is defined
   in Terraform or Pulumi (EKS, GKE, AKS), the CI pipeline can also run
   `terraform plan` on PRs and `terraform apply` on merge. The same repo can
   hold both the application and the infrastructure that runs it.
 
 The pipeline you've built today is the automation layer that turns a collection
 of YAML files into a living system. Every push to main rebuilds, rescans, and
-redeploys — and you can watch it all happen in the Actions tab. That's the
+redeploys, and you can watch it all happen in the Actions tab. That's the
 engineering loop: write code, push, and trust the pipeline.

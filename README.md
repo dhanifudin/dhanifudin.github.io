@@ -1,6 +1,6 @@
 # dhanifudin.github.io
 
-Personal website for [Dian Hanifudin Subhi](https://dhanifudin.github.io) — styled to look and
+Personal website for [Dian Hanifudin Subhi](https://dhanifudin.github.io), styled to look and
 feel like **Neovim** with the [LazyVim](https://www.lazyvim.org) distribution.
 
 [![Deploy](https://github.com/dhanifudin/dhanifudin.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/dhanifudin/dhanifudin.github.io/actions/workflows/deploy.yml)
@@ -20,7 +20,7 @@ The site mimics a full Neovim session:
 | bufferline.nvim | Top tab strip: pages as open buffers |
 | dashboard.nvim | Homepage: ASCII header + shortcut menu + stats footer |
 
-**Theme:** [Catppuccin](https://github.com/catppuccin/catppuccin) — Latte (light, default) or
+**Theme:** [Catppuccin](https://github.com/catppuccin/catppuccin): Latte (light, default) or
 Mocha (dark). Toggle with `Space t` or the ◑ button in the statusline.
 
 **Font:** [Fira Code](https://github.com/tonsky/FiraCode) for everything, including prose.
@@ -36,18 +36,19 @@ Mocha (dark). Toggle with `Space t` or the ◑ button in the statusline.
 | `Space g a` | Go to about |
 | `Space g b` | Go to blog |
 | `Space g p` | Go to projects |
+| `Space g c` | Go to CV |
 | `Space b n` / `b p` | Next / previous buffer |
 | `Space t` | Toggle Catppuccin Latte ↔ Mocha |
-| `Space 1–4` | Jump to buffer by index |
+| `Space 1–5` | Jump to buffer by index |
 | `j` / `k` | Move up/down in Neo-tree |
 
 ## Tech stack
 
-- [Astro 7](https://astro.build) — static site generator, GitHub Pages output
-- [Vue 3](https://vuejs.org) — interactive islands (`client:only="vue"`)
-- [Tailwind CSS v4](https://tailwindcss.com) — via `@tailwindcss/vite`
-- [Catppuccin](https://github.com/catppuccin/catppuccin) — CSS custom property palette
-- [@fontsource/fira-code](https://fontsource.org/fonts/fira-code) — self-hosted monospace
+- [Astro 7](https://astro.build): static site generator, GitHub Pages output
+- [Vue 3](https://vuejs.org): interactive islands (`client:only="vue"`)
+- [Tailwind CSS v4](https://tailwindcss.com): via `@tailwindcss/vite`
+- [Catppuccin](https://github.com/catppuccin/catppuccin): CSS custom property palette
+- [@fontsource/fira-code](https://fontsource.org/fonts/fira-code): self-hosted monospace
 
 ## Local development
 
@@ -67,7 +68,7 @@ npm run preview    # preview dist/
 
 ## Contributing
 
-This site uses the **OpenCode IssueOps** workflow. You can suggest changes by opening an issue —
+This site uses the **OpenCode IssueOps** workflow. You can suggest changes by opening an issue,
 no local development required.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide including the `/plan` and `/build`

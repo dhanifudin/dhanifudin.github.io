@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * NeoTree.vue — Neo-tree file explorer sidebar
+ * NeoTree.vue: Neo-tree file explorer sidebar
  *
  * Mirrors neo-tree.nvim's panel: tree header, pages as "files", blog/projects
  * as expandable directory nodes. Keyboard: j/k move, Enter navigate.

@@ -1,5 +1,5 @@
 ---
-title: "Neovim from scratch to LazyVim — a practical setup guide"
+title: "Neovim from scratch to LazyVim: a practical setup guide"
 date: 2026-08-17
 description: "Go from a bare Neovim install to a full LazyVim-based editor: install the binary, understand the config layout, bootstrap LazyVim, customize the UI with Catppuccin, wire up LSP and tooling, and keep the keymaps that actually stick."
 tags: ["neovim", "lazyvim", "catppuccin", "developer-environment", "lua", "lsp", "tutorial"]
@@ -14,7 +14,7 @@ draft: false
 ## Why I switched to Neovim
 
 I was a VS Code user for years. It worked, mostly. But there was always a faint
-friction — a mouse click here, a context-menu dive there, a settings JSON that never quite
+friction: a mouse click here, a context-menu dive there, a settings JSON that never quite
 felt like _mine_. The deeper I got into cloud and backend work, the more of my day was spent
 in a terminal: `kubectl`, `docker`, `git`, `go test`. Every time I tabbed out to a GUI editor,
 I lost the thread.
@@ -24,10 +24,10 @@ no panel that pops in from nowhere. Every action is a keypress, every setting is
 file you can read, diff, and version in git. That last part is the real unlock: my editor is a
 repo. I can clone my entire setup onto a fresh machine and be productive in minutes.
 
-The cost is upfront. Out of the box, Neovim is a blank slate — you have to _decide_ how it
+The cost is upfront. Out of the box, Neovim is a blank slate: you have to _decide_ how it
 behaves. That's exactly what this guide is for. We'll go from a raw install to a
 [LazyVim](https://www.lazyvim.org)-based setup with Catppuccin, a full LSP stack, and the
-keymaps that stuck with me. This is the same editor behind [this site's UI](/blog/hello-neovim) —
+keymaps that stuck with me. This is the same editor behind [this site's UI](/blog/hello-neovim):
 the Neo-tree sidebar, which-key popup, Telescope palette, and statusline are all nods to the
 workflow I use every day.
 
@@ -37,7 +37,7 @@ Two channels matter: **stable** and **nightly**.
 
 - **Stable** is the tagged release. It's what you want on a server or a machine you can't
   afford to babysit.
-- **Nightly** is built from `master`. It lands new features first — and occasionally breaks
+- **Nightly** is built from `master`. It lands new features first, and occasionally breaks
   them. Several popular plugins (including some LazyVim extras) expect a recent version.
 
 My advice: start with stable. Upgrade to nightly only when a plugin error message or a
@@ -50,7 +50,7 @@ brew install neovim            # stable
 brew install --HEAD neovim     # nightly
 ```
 
-**Linux** — don't rely on the distro package, which is often months old. Download the
+**Linux**: don't rely on the distro package, which is often months old. Download the
 official AppImage or tarball instead:
 
 ```bash
@@ -79,7 +79,7 @@ Then open Neovim and run:
 ```
 
 `:checkhealth` is your best friend during setup. It reports on clipboard support, Python/Node
-providers, and — once you add plugins — LSP and treesitter status. When something breaks, this
+providers, and, once you add plugins, LSP and treesitter status. When something breaks, this
 is the first place to look.
 
 ## Understanding the config layout
@@ -103,7 +103,7 @@ layout has grown out of the Lua migration:
 └── ...
 ```
 
-`init.lua` is the entrypoint. It usually stays tiny — just requiring the files that do the real
+`init.lua` is the entrypoint. It usually stays tiny: just requiring the files that do the real
 work:
 
 ```lua
@@ -135,8 +135,8 @@ it once. But maintaining a fully featured setup is a part-time job:
 - Every upgrade risks a breaking change in some plugin you configured by hand two years ago.
 
 That's the problem **LazyVim** solves. LazyVim is a _distribution_: a pre-assembled, opinionated
-Neovim configuration built on top of `lazy.nvim`. It ships sane defaults for everything —
-completion, LSP, treesitter, telescope, which-key, bufferline, statusline — so you spend your
+Neovim configuration built on top of `lazy.nvim`. It ships sane defaults for everything:
+completion, LSP, treesitter, telescope, which-key, bufferline, statusline, so you spend your
 time _tuning_ rather than _building_.
 
 The trade-off is less visibility into every moving part. But LazyVim is structured so you can
@@ -150,7 +150,7 @@ you already have:
 
 ```bash
 # Required dependencies: a recent git, a Nerd Font (for icons), and ripgrep
-# Check ripgrep — telescope uses it for live grep:
+# Check ripgrep - telescope uses it for live grep:
 which rg || echo "install ripgrep (brew install ripgrep / apt install ripgrep)"
 
 # Back up an existing config
@@ -219,13 +219,13 @@ But real specs carry **`opts`**, **`keys`**, and **`dependencies`**:
 - **`opts`** is a table merged into the plugin's default settings (LazyVim uses
   `opts = {}` for most of its plugins). This is how you customize without copying a whole
   config blob.
-- **`keys`** declares keymaps that also trigger lazy-loading — the plugin isn't loaded until
+- **`keys`** declares keymaps that also trigger lazy-loading: the plugin isn't loaded until
   you press one of its keys.
 - **`dependencies`** list plugins that must load first.
 
 ### `LazyExtras`
 
-LazyVim keeps optional functionality in **extras** — opt-in bundles you enable with one line.
+LazyVim keeps optional functionality in **extras**: opt-in bundles you enable with one line.
 Language support, additional tools, and quality-of-life packs live here. Enable an extra by
 creating `lua/plugins/extras.lua` and returning a list of specs:
 
@@ -239,7 +239,7 @@ return {
 }
 ```
 
-Browse the full catalog with `:LazyExtras` — it lists every extra with a toggle and a
+Browse the full catalog with `:LazyExtras`: it lists every extra with a toggle and a
 description. This is where most of your "setup" actually happens: enabling the Go or TypeScript
 extra wires up treesitter, LSP, formatters, and linters for that language in one shot.
 
@@ -294,10 +294,10 @@ return {
 ```
 
 `priority = 1000` ensures it loads before other UI plugins so nothing flashes the wrong theme.
-The `integrations` table tells Catppuccin to theme those plugins consistently — this is what
+The `integrations` table tells Catppuccin to theme those plugins consistently: this is what
 makes the whole UI feel like one palette instead of a patchwork.
 
-Toggle between light and dark on the fly (I use this constantly — the site mirrors it with
+Toggle between light and dark on the fly (I use this constantly: the site mirrors it with
 `Space t`):
 
 ```lua
@@ -343,7 +343,7 @@ tribute to my lualine setup.
 
 ### Font setup
 
-All those icons — filetype glyphs, chevrons, branch symbols — come from a **Nerd Font**, which
+All those icons, filetype glyphs, chevrons, branch symbols, come from a **Nerd Font**, which
 patches icon glyphs into a regular font. [Fira Code Nerd Font](https://www.nerdfonts.com/font-downloads)
 is my choice: ligatures for `=>`, `!=`, and `->`, plus the icon set. Install it, then set your
 terminal and your GUI font to `FiraCode Nerd Font`. Without a Nerd Font every icon renders as a
@@ -361,7 +361,7 @@ together for you:
 | Completion | `nvim-cmp` | Autocomplete, snippets, source integration |
 | Syntax | `tree-sitter` | Incremental parsing for highlighting, folding, refactors |
 
-### Mason — installing language servers
+### Mason: installing language servers
 
 Open Mason with:
 
@@ -492,7 +492,7 @@ You're not using a Nerd Font. Install one and set it as the terminal/GUI font (s
 Some plugins need `pynvim` or a Node runtime. On macOS/Linux: `pip3 install pynvim` and ensure
 `node` is on your PATH. Re-run `:checkhealth` to confirm the provider turns green.
 
-**4. LSP isn't starting — "Client X quit with exit code" or no diagnostics.**
+**4. LSP isn't starting: "Client X quit with exit code" or no diagnostics.**
 The server isn't installed or isn't on PATH. `:Mason` → install the server, then `:LspInfo` to
 confirm it attached to the buffer. Restart with `:LspRestart`.
 
@@ -526,7 +526,7 @@ git remote add origin git@github.com:dhanifudin/dotfiles.git
 git push -u origin main
 ```
 
-My own config lives at [github.com/dhanifudin/nvim](https://github.com/dhanifudin/nvim) — it's
+My own config lives at [github.com/dhanifudin/nvim](https://github.com/dhanifudin/nvim), it's
 the source of truth for the editor described here, and it's listed as a [project](/projects) on
 this site. Steal freely.
 
@@ -539,12 +539,12 @@ look. This is the natural next entry in the CLI-first series.
 
 ### Keep reading
 
-- [LazyVim docs](https://www.lazyvim.org) — the reference for every option and extra.
-- [lazy.nvim docs](https://lazy.folke.io) — for deeper plugin-manager mechanics.
-- [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) — if you want to see a hand-rolled
+- [LazyVim docs](https://www.lazyvim.org): the reference for every option and extra.
+- [lazy.nvim docs](https://lazy.folke.io): for deeper plugin-manager mechanics.
+- [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim): if you want to see a hand-rolled
   alternative and understand what LazyVim is abstracting away.
 - This site's [hello-neovim](/blog/hello-neovim) and [catppuccin-everywhere](/blog/catppuccin-everywhere)
   posts, for the story behind the editor-shaped UI you're reading right now.
 
-The endgame isn't a perfect config — it's a config you stop thinking about. Install, customize
+The endgame isn't a perfect config: it's a config you stop thinking about. Install, customize
 until it's comfortable, then commit it and get back to building things.

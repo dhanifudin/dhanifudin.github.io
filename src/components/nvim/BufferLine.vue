@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * BufferLine.vue — bufferline.nvim-style tab strip
+ * BufferLine.vue: bufferline.nvim-style tab strip
  *
  * Shows each site page as a "buffer" tab with filetype icon. Active tab
  * underlined with accent color. Supports <leader>1-4 and bn/bp via

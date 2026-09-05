@@ -1,5 +1,5 @@
 ---
-title: "Kubernetes for developers — from Compose to cluster"
+title: "Kubernetes for developers: from Compose to cluster"
 date: 2026-06-28
 description: "Bridge the gap from Docker Compose to Kubernetes: set up a local cluster with kind, translate Compose services into Deployments and Services, and learn the core objects you need every day."
 tags: ["kubernetes", "k8s", "cloud", "devops"]
@@ -33,7 +33,7 @@ want three replicas of `api` running, listening on port 8080"_ and Kubernetes sc
 restarts, scales, and load-balances them across a pool of machines.
 
 The learning curve is real, but the concepts map cleanly onto what you already know from Compose.
-This tutorial shows you the smallest useful subset — enough to go from `docker compose up` to
+This tutorial shows you the smallest useful subset: enough to go from `docker compose up` to
 `kubectl apply` in one sitting.
 
 ## The smallest useful concepts
@@ -42,7 +42,7 @@ Kubernetes has 50+ resource types, but you only need five to start shipping:
 
 ### Pod
 
-A Pod is the smallest deployable unit — one or more containers that share a network namespace
+A Pod is the smallest deployable unit: one or more containers that share a network namespace
 (localhost-visible), IPC namespace, and optional shared volumes. In practice you almost never
 create a bare Pod; you let a higher-level controller do it.
 
@@ -52,7 +52,7 @@ Think of a Pod as an _instance_ of your container, like a single `docker run`.
 
 A Deployment manages a set of identical Pods. You declare a desired replica count and a Pod
 template; the Deployment controller creates and maintains ReplicaSets, which in turn own the Pods.
-When you update the template (e.g. a new image tag), the Deployment performs a **rolling update** —
+When you update the template (e.g. a new image tag), the Deployment performs a **rolling update**:
 gradually replacing old Pods with new ones so the service stays reachable.
 
 This is the Kubernetes equivalent of `docker compose up --scale api=3` with the ability to
@@ -60,7 +60,7 @@ update in place without downtime.
 
 ### Service
 
-Pods are ephemeral — they get new IPs when they restart. A **Service** gives you a stable IP
+Pods are ephemeral: they get new IPs when they restart. A **Service** gives you a stable IP
 and DNS name that load-balances across a set of Pods matching a label selector. When a Pod
 comes or goes, the Service's endpoint list updates automatically.
 
@@ -72,13 +72,13 @@ container lifecycle and spanning any node in the cluster.
 A **ConfigMap** stores non-sensitive key-value pairs (environment variables, config files).
 A **Secret** does the same for credentials, tokens, and keys. Both can be mounted as files
 or injected as environment variables. This is how you externalise configuration from your
-container images — the Kubernetes equivalent of the `environment` block in a Compose file,
+container images: the Kubernetes equivalent of the `environment` block in a Compose file,
 but with the ability to update independently and reference the same values across multiple
 Deployments.
 
 ### Namespace
 
-A Namespace is a virtual cluster — a scope for names. You can have `api` in `staging` and
+A Namespace is a virtual cluster: a scope for names. You can have `api` in `staging` and
 `api` in `production` without collision. Resource quotas and RBAC rules apply per-namespace.
 For a local dev cluster, the `default` namespace is fine.
 
@@ -102,7 +102,7 @@ brew install kind
 # Windows (winget):
 winget install Kubernetes.kind
 
-# kubectl — the Kubernetes CLI
+# kubectl - the Kubernetes CLI
 # Linux/macOS:
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
@@ -188,10 +188,10 @@ Mapping this to Kubernetes means answering four questions:
 | `services.api` container | Deployment (Pod template) |
 | `ports: "8080:8080"` | Service (ClusterIP or NodePort) |
 | `environment:` keys | ConfigMap / Secret + envFrom |
-| `depends_on:` | Not needed — Kubernetes restarts Pods until dependencies are reachable; initContainers for ordering |
+| `depends_on:` | Not needed - Kubernetes restarts Pods until dependencies are reachable; initContainers for ordering |
 
 For the database and cache, we'll keep `postgres` and `redis` as Deployments with their own
-Services so the Go API can reach them at `db:5432` and `cache:6379` — same DNS names as Compose.
+Services so the Go API can reach them at `db:5432` and `cache:6379`, same DNS names as Compose.
 
 ## Deploy the Go API
 
@@ -264,7 +264,7 @@ kubectl get svc
 ```
 
 The `ClusterIP` Service type (the default) assigns an internal IP that other Pods can reach at
-`db:5432` — the Kubernetes DNS resolves `<service-name>.<namespace>.svc.cluster.local`.
+`db:5432`: the Kubernetes DNS resolves `<service-name>.<namespace>.svc.cluster.local`.
 
 ### A Redis Deployment (abbreviated)
 
@@ -304,7 +304,7 @@ spec:
       targetPort: 6379
 ```
 
-Note the `---` separator — you can define multiple resources in one file. Kubernetes splits
+Note the `---` separator: you can define multiple resources in one file. Kubernetes splits
 them into individual documents when you `kubectl apply`.
 
 ### The API Deployment
@@ -449,7 +449,7 @@ base64-encoded values, or better yet, use a tool like **Sealed Secrets** or **Ex
 Secrets Operator** to avoid storing secrets in Git altogether.
 
 ```yaml
-# manifests/api-secret.yaml — production-style alternative
+# manifests/api-secret.yaml - production-style alternative
 apiVersion: v1
 kind: Secret
 metadata:
@@ -485,7 +485,7 @@ spec:
 
 Kubernetes resolves `$(DB_PASSWORD)` from the Secret's `DB_PASSWORD` key when the container
 starts. If your application reads individual env vars (`DB_HOST`, `DB_USER`, `DB_PASS`,
-`DB_NAME`), you can skip the template and use `envFrom` exclusively — even cleaner.
+`DB_NAME`), you can skip the template and use `envFrom` exclusively, even cleaner.
 
 ```bash
 kubectl apply -f manifests/api-config.yaml
@@ -495,7 +495,7 @@ kubectl apply -f manifests/api.yaml  # picks up the new env sources
 
 ## Expose the service
 
-So far our `api` Service is `ClusterIP` — reachable only inside the cluster. There are
+So far our `api` Service is `ClusterIP`: reachable only inside the cluster. There are
 three ways to expose a Service externally:
 
 ### ClusterIP (default)
@@ -694,13 +694,13 @@ Get events, conditions, and recent state transitions for a resource:
 kubectl describe deployment api
 kubectl describe pod api-58f9b7d4c-8km2x
 
-# Look for Events at the bottom — it shows image pull failures,
+# Look for Events at the bottom - it shows image pull failures,
 # probe failures, scheduling issues, and OOM kills
 ```
 
 ### `kubectl exec`
 
-Run a command inside a running container — the Kubernetes equivalent of `docker exec`:
+Run a command inside a running container: the Kubernetes equivalent of `docker exec`:
 
 ```bash
 # Open a shell
@@ -746,19 +746,19 @@ docker volume prune
 You've now covered the bridge from single-host Compose to multi-node Kubernetes. The next
 steps in the Cloud & DevOps stream build on this foundation:
 
-- **Helm** — package, version, and share Kubernetes manifests as charts. The Go API manifests
+- **Helm**: package, version, and share Kubernetes manifests as charts. The Go API manifests
   we wrote by hand become a reusable `values.yaml` with templated resources.
 
-- **GitOps with Argo CD or Flux** — store your manifests in Git and let a controller
+- **GitOps with Argo CD or Flux**: store your manifests in Git and let a controller
   continuously reconcile the cluster toward the desired state in the repo. Merge to main,
   and the cluster updates itself.
 
-- **CI/CD for Kubernetes** — integrate image builds (Docker), vulnerability scans (Trivy),
+- **CI/CD for Kubernetes**: integrate image builds (Docker), vulnerability scans (Trivy),
   and deployment (kubectl/Helm) into GitHub Actions pipelines triggered on push.
 
-- **Observability** — add Prometheus for metrics, Grafana for dashboards, and Loki for
+- **Observability**: add Prometheus for metrics, Grafana for dashboards, and Loki for
   log aggregation. The `stern` command is a start; a full observability stack turns logs,
   metrics, and traces into actionable information.
 
-Kubernetes is deep, but the core loop — write YAML, `kubectl apply`, verify, iterate —
+Kubernetes is deep, but the core loop, write YAML, `kubectl apply`, verify, iterate,
 is the same from your first Deployment to a production cluster with a hundred microservices.

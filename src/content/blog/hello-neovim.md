@@ -1,19 +1,19 @@
 ---
 title: "Hello, Neovim World"
 date: 2026-01-15
-description: "Why I rebuilt my personal site to look like Neovim — and why you might want to too."
+description: "Why I rebuilt my personal site to look like Neovim: and why you might want to too."
 tags: ["neovim", "astro", "webdev", "lazyvim"]
 draft: false
 ---
 
 ## The idea
 
-I spend most of my day inside Neovim. The muscle memory, the keybindings, the split panes — they
+I spend most of my day inside Neovim. The muscle memory, the keybindings, the split panes: they
 feel like a second skin. So when I rebuilt my personal site, I asked: _what if the site itself felt
 like the editor?_
 
-Not a gimmick. A genuine attempt to bring the **Neovim UX** — keyboard-first navigation,
-minimal chrome, a colorscheme I'm obsessed with — to the browser.
+Not a gimmick. A genuine attempt to bring the **Neovim UX** - keyboard-first navigation,
+minimal chrome, a colorscheme I'm obsessed with - to the browser.
 
 ## What it's built with
 
@@ -21,7 +21,7 @@ minimal chrome, a colorscheme I'm obsessed with — to the browser.
 - [Vue 3](https://vuejs.org) for interactive islands (NeoTree, which-key, command palette)
 - [Tailwind CSS v4](https://tailwindcss.com) via the Vite plugin
 - [Catppuccin](https://github.com/catppuccin/catppuccin) theme (Latte / Mocha)
-- [Fira Code](https://github.com/tonsky/FiraCode) for _everything_ — monospace all the way
+- [Fira Code](https://github.com/tonsky/FiraCode) for _everything_: monospace all the way
 
 ## The key pieces
 

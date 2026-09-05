@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug! Be as specific as possible — the more detail you provide,
+        Thanks for reporting a bug! Be as specific as possible: the more detail you provide,
         the more accurately the AI can understand and fix it.
 
         **Triggering the fix:**

@@ -45,8 +45,8 @@ export const socials: Social[] = [
   { label: 'GitHub',    url: 'https://github.com/dhanifudin',              icon: '' },
   { label: 'LinkedIn',  url: 'https://www.linkedin.com/in/dhanifudin/',    icon: 'in' },
   { label: 'YouTube',   url: 'https://youtube.com/c/dhanifudin',           icon: '▶' },
-  { label: 'Email',     url: 'mailto:dhanifudin@gmail.com',                icon: '✉' },
-  { label: 'WhatsApp',  url: 'https://wa.me/6282230743546',              icon: '📱' },
+  { label: 'Email',     url: 'mailto:dhanifudin@gmail.com',                icon: '✉︎' },
+  { label: 'WhatsApp',  url: 'https://wa.me/6282230743546',              icon: '✆' },
 ];
 
 // WhichKey binding map (used by WhichKey.vue)
@@ -55,7 +55,7 @@ export type KeyBinding =
   | { type: 'group';  key: string; icon: string; label: string; children: KeyBinding[] };
 
 export const whichKeyBindings: KeyBinding[] = [
-  { type: 'action', key: 'f', icon: '🔍', label: 'find file' },
+  { type: 'action', key: 'f', icon: '/', label: 'find file' },
   { type: 'action', key: 'e', icon: '▤',  label: 'explorer' },
   {
     type: 'group', key: 'g', icon: '↗', label: '+goto',
@@ -91,12 +91,12 @@ export interface DashboardItem {
 }
 
 export const dashboardItems: DashboardItem[] = [
-  { key: 'f', icon: '🔍', label: 'Find File',           action: 'palette' },
+  { key: 'f', icon: '/',  label: 'Find File',           action: 'palette' },
   { key: 'n', icon: '✎',  label: 'New Issue / Suggest', action: 'external', target: 'https://github.com/dhanifudin/dhanifudin.github.io/issues/new/choose' },
-  { key: 'a', icon: '👤',  label: 'About Me',            action: 'navigate', target: '/about' },
+  { key: 'a', icon: '✎',  label: 'About Me',            action: 'navigate', target: '/about' },
   { key: 'b', icon: '▤',  label: 'Blog',                action: 'navigate', target: '/blog' },
   { key: 'p', icon: '▣',  label: 'Projects',            action: 'navigate', target: '/projects' },
   { key: 'c', icon: '⎙',  label: 'Resume / CV',         action: 'navigate', target: '/cv' },
-  { key: 'g', icon: '',  label: 'GitHub Profile',      action: 'external', target: 'https://github.com/dhanifudin' },
+  { key: 'g', icon: 'gh', label: 'GitHub Profile',      action: 'external', target: 'https://github.com/dhanifudin' },
   { key: 'q', icon: '×',  label: 'Quit',                action: 'leader',   leaderAction: 'quit' },
 ];

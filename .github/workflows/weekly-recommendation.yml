@@ -72,7 +72,7 @@ jobs:
             const focus = process.env.FOCUS || 'auto'
 
             const focusInstruction = focus !== 'auto'
-              ? 'You MUST recommend a "' + focus + '" item — the category is forced by the caller.'
+              ? 'You MUST recommend a "' + focus + '" item: the category is forced by the caller.'
               : 'Pick whichever single category and topic will deliver the most value this week.'
 
             // Load the topics streams from src/data/topics.json
@@ -90,41 +90,49 @@ jobs:
               'YOUR TASK: recommend the SINGLE most valuable improvement to file as ONE GitHub issue this week.\n' +
               focusInstruction + '\n\n' +
               'THREE LENSES (pick one):\n' +
-              '  bug      — A real, concrete defect in the site. PREFER this if the build log ' +
-              'below shows errors or warnings. Ground the issue in actual output — no speculation.\n' +
-              '  feature  — Something a personal developer/academic site commonly has that this ' +
+              '  bug:      A real, concrete defect in the site. PREFER this if the build log ' +
+              'below shows errors or warnings. Ground the issue in actual output, no speculation.\n' +
+              '  feature:  Something a personal developer/academic site commonly has that this ' +
               'site lacks (e.g. RSS feed, sitemap, Open Graph meta, real search index backing the ' +
               'Telescope UI, tag/category pages, reading-time estimates, code-block copy buttons, ' +
               'print-friendly styles, PWA support, etc.).\n' +
-              '  tutorial — A new blog post. Align to the topic streams in src/data/topics.json ' +
-              '(shown below). Read src/content/blog/ to see what already exists and pick a topic ' +
-              'not yet covered.\n\n' +
+              '  tutorial: A new blog post. The Neovim look is only the site\'s visual theme, not ' +
+              'a content mandate: do NOT bias topics toward Neovim or any single language. Rotate ' +
+              'across ALL the streams in src/data/topics.json (cloud, backend, databases, web dev, ' +
+              'developer environment, teaching, security) rather than favoring one. Read ' +
+              'src/content/blog/ to see what already exists and pick a topic not yet covered.\n\n' +
               'TOPIC STREAMS (src/data/topics.json):\n' +
               '<topics_json>\n' + topicsText + '\n</topics_json>\n\n' +
               'TO UNDERSTAND CURRENT STATE (read these files before deciding):\n' +
-              '  src/content/blog/          — existing blog posts (titles, slugs, tags)\n' +
-              '  src/content/projects/      — existing projects\n' +
-              '  src/data/topics.json       — the 3 tutorial topic streams\n' +
-              '  src/content.config.ts      — blog/project frontmatter schema\n\n' +
+              '  src/content/blog/:      existing blog posts (titles, slugs, tags)\n' +
+              '  src/content/projects/:  existing projects\n' +
+              '  src/data/topics.json:   the tutorial topic streams\n' +
+              '  src/content.config.ts:  blog/project frontmatter schema\n\n' +
               'BUILD / ASTRO CHECK OUTPUT (exit code ' + buildExitCode + '):\n' +
               '<build_log>\n' + buildLog + '\n</build_log>\n\n' +
               'EXISTING ISSUE TITLES (do NOT create a near-duplicate of any of these):\n' +
               '<existing_issues>\n' + existingTitles + '\n</existing_issues>\n\n' +
               'OUTPUT RULES (strictly follow all):\n' +
-              '  1. Output ONLY one raw JSON object — no markdown fences, no prose before or after.\n' +
+              '  1. Output ONLY one raw JSON object: no markdown fences, no prose before or after.\n' +
               '  2. Do NOT edit any files, create branches, or open pull requests.\n' +
               '  3. JSON shape:\n' +
               '     {\n' +
               '       "category": "bug" | "feature" | "tutorial",\n' +
               '       "title": "<concise issue title, no leading slash, max 80 chars>",\n' +
-              '       "body": "<markdown body — see requirements below>"\n' +
+              '       "body": "<markdown body, see requirements below>"\n' +
               '     }\n' +
               '  4. body requirements:\n' +
               '     - ## Problem / Opportunity  (what is wrong or missing, with evidence)\n' +
               '     - ## Why It Matters          (impact on visitors or site quality)\n' +
               '     - ## Acceptance Criteria     (markdown task checklist)\n' +
               '     - For tutorial issues also include:\n' +
-              '       ## Suggested Outline       (H2 sections the post should cover)\n'
+              '       ## Suggested Outline       (H2 sections the post should cover)\n' +
+              '  5. STYLE RULES for the title, body, and any content the issue asks a future post ' +
+              'or page to contain:\n' +
+              '     - Never use the em dash character. Use a comma, colon, period, or a spaced ' +
+              'hyphen ( - ) instead.\n' +
+              '     - Never use color emoji (e.g. no rocket, checkmark, or fire emoji). If a glyph ' +
+              'is needed, use a plain text symbol instead.\n'
 
             fs.writeFileSync('/tmp/oc-prompt.txt', prompt)
             core.info('Prompt written (' + String(prompt.length) + ' chars), focus=' + focus + ', build_exit=' + buildExitCode)
@@ -184,7 +192,7 @@ jobs:
             const normTitle = norm(title)
             const dup = listResp.data.find(function(i) { return norm(i.title) === normTitle })
             if (dup) {
-              core.info('Skipping — near-duplicate already exists: #' + String(dup.number) + ' ' + dup.title)
+              core.info('Skipping: near-duplicate already exists: #' + String(dup.number) + ' ' + dup.title)
               return
             }
 
@@ -205,7 +213,7 @@ jobs:
             const created = await github.rest.issues.create({
               owner, repo, title, body: fullBody, labels
             })
-            core.info('Issue created: #' + String(created.data.number) + ' — ' + created.data.html_url)
+            core.info('Issue created: #' + String(created.data.number) + ': ' + created.data.html_url)
 
       - name: Report workflow failure
         if: failure()

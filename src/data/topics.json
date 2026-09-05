@@ -12,29 +12,55 @@
         "self-hosting and homelab setups",
         "serverless and edge computing",
         "cloud cost optimisation",
-        "GitOps workflows"
+        "GitOps workflows",
+        "high-availability architecture patterns",
+        "incident response and on-call practices"
       ]
     },
     {
       "name": "Backend Development",
       "topics": [
-        "building REST APIs with Go",
+        "building REST APIs",
         "gRPC services in practice",
         "database design and migrations",
         "authentication and authorisation patterns",
         "message queues and event-driven architecture",
         "unit and integration testing for backend services",
         "API versioning strategies",
-        "caching patterns (Redis, in-memory)",
+        "caching patterns",
         "rate limiting and throttling",
-        "writing CLIs in Go"
+        "writing CLIs",
+        "background jobs and task queues"
+      ]
+    },
+    {
+      "name": "Databases & Messaging",
+      "topics": [
+        "relational schema design",
+        "query optimisation and indexing strategies",
+        "replication and high-availability database clusters",
+        "PostgreSQL administration essentials",
+        "Redis as a caching and session layer",
+        "RabbitMQ and asynchronous message architectures",
+        "database backup and disaster recovery",
+        "connection pooling and performance tuning"
+      ]
+    },
+    {
+      "name": "Web Development",
+      "topics": [
+        "building static sites with Astro",
+        "Vue 3 composition API patterns",
+        "progressive web apps and offline support",
+        "web performance and Core Web Vitals",
+        "accessible frontend components",
+        "content collections and static site generation",
+        "component design systems"
       ]
     },
     {
       "name": "Developer Environment & CLI",
       "topics": [
-        "Neovim from scratch to LazyVim",
-        "Lua scripting for Neovim plugins",
         "Nix for reproducible developer environments",
         "managing dotfiles with Nix (Home Manager)",
         "terminal workflows: tmux, zsh, fzf",
@@ -42,7 +68,29 @@
         "Git internals and advanced workflows",
         "multiplexers and session management",
         "fuzzy-finding everything with fzf/telescope",
-        "living in the terminal: tips for CLI-first development"
+        "living in the terminal: tips for CLI-first development",
+        "editor configuration and productivity"
+      ]
+    },
+    {
+      "name": "Teaching & Mentoring",
+      "topics": [
+        "designing a project-based learning curriculum",
+        "building autograding systems for student code",
+        "mentoring early-career developers",
+        "running hands-on workshops and hackathons",
+        "writing technical documentation that students actually read",
+        "code review as a teaching tool"
+      ]
+    },
+    {
+      "name": "Security",
+      "topics": [
+        "API security fundamentals",
+        "secrets management in CI/CD",
+        "securing container workloads",
+        "OWASP top 10 in practice",
+        "zero-trust networking basics"
       ]
     }
   ]

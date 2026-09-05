@@ -416,6 +416,10 @@ jobs:
             prompt += '- Edit source files only.\n'
             prompt += '- Do NOT run git commands, npm install/build, or create pull requests.\n'
             prompt += '- The workflow handles all git operations automatically.\n'
+            prompt += '- Follow the "Writing style" and "Blog topics" conventions in AGENTS.md for ' +
+              'any blog post, page copy, or UI label you write or edit: no em dash characters, ' +
+              'no color emoji (use the plain text symbols already used across the site), and no ' +
+              'bias toward Neovim or Go as the only blog topics.\n'
 
             fs.writeFileSync('/tmp/oc-prompt.txt', prompt)
             core.setOutput('routes', JSON.stringify(routes))
@@ -451,12 +455,12 @@ jobs:
           BRANCH="opencode/issue-${ISSUE_NUMBER}"
           git fetch origin main
           if git ls-remote --exit-code origin "refs/heads/${BRANCH}" >/dev/null 2>&1; then
-            echo "Branch ${BRANCH} exists — rebasing on origin/main"
+            echo "Branch ${BRANCH} exists, rebasing on origin/main"
             git fetch origin "${BRANCH}"
             git checkout -B "${BRANCH}" "origin/${BRANCH}"
             git rebase origin/main
           else
-            echo "Branch ${BRANCH} not found — creating from origin/main"
+            echo "Branch ${BRANCH} not found, creating from origin/main"
             git checkout -B "${BRANCH}" origin/main
           fi
 
@@ -469,7 +473,7 @@ jobs:
           OPENCODE_GO_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
           MODEL: ${{ vars.OPENCODE_BUILD_MODEL || 'opencode-go/deepseek-v4-pro' }}
 
-      # Verify the build passes BEFORE committing/pushing — no broken-build PRs.
+      # Verify the build passes BEFORE committing/pushing: no broken-build PRs.
       - name: Verify build
         run: npm run build
 

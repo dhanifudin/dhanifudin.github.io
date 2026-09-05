@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Dashboard.vue — dashboard.nvim / alpha-nvim style homepage
+ * Dashboard.vue: dashboard.nvim / alpha-nvim style homepage
  *
  * ASCII header · shortcut menu · footer stats + socials.
  * Every shortcut is wired through the keyboard controller.
@@ -181,7 +181,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
           fontSize: '12px',
         }"
       >
-        <span>⚡</span>
+        <span>↯</span>
         <span>{{ postCount ?? 0 }} posts</span>
         <span :style="{ color: 'var(--ctp-surface1)' }">·</span>
         <span>{{ projectCount ?? 0 }} projects</span>

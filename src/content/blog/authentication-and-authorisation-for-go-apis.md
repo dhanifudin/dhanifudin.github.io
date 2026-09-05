@@ -1,7 +1,7 @@
 ---
 title: "Authentication and authorisation patterns for Go APIs"
 date: 2026-08-03
-description: "Secure a Go REST API with JWT bearer tokens, bcrypt password hashing, and role-based access control — then wire it into Kubernetes with Secrets and write tests that verify every auth path."
+description: "Secure a Go REST API with JWT bearer tokens, bcrypt password hashing, and role-based access control, then wire it into Kubernetes with Secrets and write tests that verify every auth path."
 tags: ["go", "backend", "security", "jwt", "authentication"]
 series:
   id: from-go-api-to-kubernetes
@@ -14,7 +14,7 @@ draft: false
 ## Why the current open API needs auth
 
 In the [REST API tutorial](/blog/building-rest-apis-with-go) we built a Go API
-with `net/http` and `chi` — structured handlers, middleware, and an in-memory store.
+with `net/http` and `chi`: structured handlers, middleware, and an in-memory store.
 The [database tutorial](/blog/database-design-and-migrations-for-go) migrated it to
 PostgreSQL. The [Kubernetes tutorial](/blog/kubernetes-for-developers) deployed it to
 a cluster. The [CI/CD tutorial](/blog/ci-cd-pipelines-with-github-actions) automated
@@ -34,9 +34,9 @@ to a hardened service.
 
 These terms are often confused. Here they are in one sentence each:
 
-- **Authentication** answers "who are you?" — it is the process of verifying an
+- **Authentication** answers "who are you?": it is the process of verifying an
   identity (username + password, JWT token, OAuth flow).
-- **Authorisation** answers "what can you do?" — it is the process of checking
+- **Authorisation** answers "what can you do?": it is the process of checking
   whether the authenticated identity has permission to perform a given action
   (delete a resource, access an admin endpoint).
 
@@ -65,7 +65,7 @@ internal/
 ## JWT-based authentication
 
 JWT (JSON Web Token) is a compact, URL-safe token format. A JWT consists of three
-parts — header, payload, and signature — each base64-encoded and joined by dots.
+parts: header, payload, and signature, each base64-encoded and joined by dots.
 The signature is a HMAC-SHA256 of the header and payload using a secret key known
 only to the server. This means the server can verify the token was not tampered
 with, and can trust the claims inside without a database lookup on every request.
@@ -74,7 +74,7 @@ with, and can trust the claims inside without a database lookup on every request
 
 The Go ecosystem has settled on `golang-jwt/jwt/v5` as the de facto JWT library.
 It is actively maintained, has a clean API, and supports all standard signing
-algorithms. The `v5` release cleaned up the API considerably — gone are the
+algorithms. The `v5` release cleaned up the API considerably: gone are the
 confusing `StandardClaims` and `MapClaims` types, replaced by `RegisteredClaims`
 and typed custom claims.
 
@@ -105,7 +105,7 @@ type Claims struct {
 }
 ```
 
-`UserID` is stored in the `sub` (subject) claim — the standard JWT field for the
+`UserID` is stored in the `sub` (subject) claim, the standard JWT field for the
 principal identifier. `Role` is a custom claim that middleware will read to enforce
 RBAC.
 
@@ -140,7 +140,7 @@ func GenerateToken(userID int64, role string) (string, error) {
 HS256 (HMAC-SHA256) is appropriate for a single-service architecture because the
 same secret is used to sign and verify tokens. If you later split into
 microservices where multiple services need to verify tokens without sharing a
-secret, switch to RS256 (asymmetric) — that is a one-line change with this library.
+secret, switch to RS256 (asymmetric). That is a one-line change with this library.
 
 ### Validate tokens
 
@@ -170,8 +170,8 @@ func ValidateToken(tokenString string) (*Claims, error) {
 }
 ```
 
-The key callback validates the signing algorithm — rejecting tokens that claim to
-use `alg: none` — and returns the signing key. `ParseWithClaims` handles expiry
+The key callback validates the signing algorithm, rejecting tokens that claim to
+use `alg: none`, and returns the signing key. `ParseWithClaims` handles expiry
 checks automatically through `RegisteredClaims`.
 
 ## Middleware in Go
@@ -211,7 +211,7 @@ func GetClaims(ctx context.Context) *Claims {
 ```
 
 Using an unexported `contextKey` type prevents other packages from accidentally
-colliding with this key — `context.WithValue` matches on both type and value.
+colliding with this key: `context.WithValue` matches on both type and value.
 
 ### AuthMiddleware
 
@@ -248,7 +248,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 }
 ```
 
-This is orthogonal to the router — it works with `chi`, `net/http`, or any router
+This is orthogonal to the router: it works with `chi`, `net/http`, or any router
 that supports standard middleware. After this middleware runs, any downstream
 handler can call `GetClaims(r.Context())` to get the authenticated user's ID and
 role.
@@ -280,7 +280,7 @@ func RequireRole(roles ...string) func(http.Handler) http.Handler {
 }
 ```
 
-`RequireRole` is a higher-order function — it takes a list of allowed roles and
+`RequireRole` is a higher-order function: it takes a list of allowed roles and
 returns middleware. This is a common Go pattern that avoids hardcoding role logic
 inside handlers.
 
@@ -291,14 +291,14 @@ In `main.go`, apply the middlewares to the route groups that need protection:
 ```go
 r := chi.NewRouter()
 
-// Public routes — no auth required
+// Public routes - no auth required
 r.Group(func(r chi.Router) {
     r.Get("/health", healthHandler)
     r.Post("/api/auth/login", loginHandler)
     r.Post("/api/auth/register", registerHandler)
 })
 
-// Protected routes — requires valid JWT
+// Protected routes - requires valid JWT
 r.Group(func(r chi.Router) {
     r.Use(auth.AuthMiddleware)
 
@@ -309,7 +309,7 @@ r.Group(func(r chi.Router) {
     r.Delete("/api/items/{itemID}", deleteItem)
 })
 
-// Admin routes — requires valid JWT + admin role
+// Admin routes - requires valid JWT + admin role
 r.Group(func(r chi.Router) {
     r.Use(auth.AuthMiddleware)
     r.Use(auth.RequireRole("admin"))
@@ -325,7 +325,7 @@ Adding a new route is a one-line decision: which group does it belong to?
 
 ## Password hashing
 
-Storing plaintext passwords is never acceptable. Use `bcrypt` — it is part of the
+Storing plaintext passwords is never acceptable. Use `bcrypt`: it is part of the
 Go extended standard library (`golang.org/x/crypto/bcrypt`) and has been
 battle-tested for over two decades.
 
@@ -354,7 +354,7 @@ func CheckPassword(password, hash string) bool {
 ```
 
 A cost of 12 means `2^12 = 4096` iterations. On a modern CPU this takes ~250 ms
-per hash — slow enough to deter brute-force attacks, fast enough that a login
+per hash, slow enough to deter brute-force attacks, fast enough that a login
 endpoint doesn't feel sluggish. Adjust up or down based on your threat model and
 hardware.
 
@@ -373,7 +373,7 @@ CREATE TABLE users (
 ```
 
 The `role` column defaults to `'user'`. Promote a user to admin manually (or via
-a migration) — there is no self-service admin registration.
+a migration). There is no self-service admin registration.
 
 ### Login handler
 
@@ -430,7 +430,7 @@ func LoginHandler(userStore *store.UserStore) http.HandlerFunc {
 ```
 
 Notice both "user not found" and "wrong password" return the same message. This
-prevents username enumeration — an attacker cannot distinguish between a valid
+prevents username enumeration: an attacker cannot distinguish between a valid
 email with a wrong password and a non-existent email.
 
 ### Registration handler
@@ -484,7 +484,7 @@ func RegisterHandler(userStore *store.UserStore) http.HandlerFunc {
 }
 ```
 
-Registering returns a token immediately — the user is logged in after signup
+Registering returns a token immediately: the user is logged in after signup
 without a second round-trip.
 
 ## Role-based access control (RBAC)
@@ -531,7 +531,7 @@ func deleteItem(store *store.ItemStore) http.HandlerFunc {
 
 The pattern: middleware handles broad role gates (admin vs user), handlers handle
 fine-grained ownership checks. Keep authorisation logic as close to the data as
-possible — the handler knows what "owning a resource" means in a way that generic
+possible: the handler knows what "owning a resource" means in a way that generic
 middleware cannot.
 
 ## Cookies vs Bearer tokens
@@ -550,7 +550,7 @@ A common question when adding auth to a Go API: should I use cookies or the
 **For a REST API consumed by multiple clients (SPA, mobile, CLI), prefer Bearer
 tokens.** They are client-agnostic and immune to CSRF because the client must
 explicitly attach the header. The downside is that an XSS vulnerability can steal
-the token, so your SPA must store it carefully — in a closure or a Web Worker, not
+the token, so your SPA must store it carefully, in a closure or a Web Worker, not
 in `localStorage`.
 
 **For a traditional server-rendered app where the Go server serves HTML, prefer
@@ -611,12 +611,12 @@ func RefreshHandler(authStore *store.AuthStore) http.HandlerFunc {
 }
 ```
 
-Rotating the refresh token on every use limits the window for replay attacks —
+Rotating the refresh token on every use limits the window for replay attacks:
 the old token becomes invalid as soon as the new one is issued.
 
 ## Testing
 
-Auth code is security code — it deserves thorough tests. There are two layers of
+Auth code is security code: it deserves thorough tests. There are two layers of
 testing: unit tests for the pure functions (token validation, password hashing)
 and integration tests for the HTTP middleware and handlers.
 
@@ -670,7 +670,7 @@ func TestValidateExpiredToken(t *testing.T) {
 }
 ```
 
-The expiry test is a conceptual sketch — in practice, use the library's
+The expiry test is a conceptual sketch: in practice, use the library's
 `jwt.WithTimeFunc` option to inject a fake clock, or generate tokens with explicit
 `NotBefore`/`ExpiresAt` in the past.
 
@@ -702,12 +702,12 @@ func TestHashPasswordDeterministic(t *testing.T) {
     h2, _ := HashPassword("same-password")
 
     if h1 == h2 {
-        t.Error("two hashes of the same password should differ — bcrypt includes a random salt")
+        t.Error("two hashes of the same password should differ: bcrypt includes a random salt")
     }
 }
 ```
 
-The second test verifies that bcrypt's salt is random — identical inputs produce
+The second test verifies that bcrypt's salt is random: identical inputs produce
 different outputs, preventing rainbow-table attacks.
 
 ### Integration tests for the auth middleware
@@ -819,7 +819,7 @@ func TestRequireRoleAllowsCorrectRole(t *testing.T) {
 }
 ```
 
-Run the tests with the race detector enabled — auth middleware shares the signing
+Run the tests with the race detector enabled. Auth middleware shares the signing
 key as a package-level variable, so concurrent tests should not race:
 
 ```bash
@@ -829,7 +829,7 @@ go test -race ./internal/auth/...
 ## Kubernetes wiring
 
 In the earlier tutorials, environment variables came from Kubernetes ConfigMaps.
-Secrets — like the JWT signing key and database passwords — should use Kubernetes
+Secrets, like the JWT signing key and database passwords, should use Kubernetes
 Secrets instead. ConfigMaps are stored in plaintext in `etcd`; Secrets are
 base64-encoded (not encrypted at rest with default settings, but they are a
 separate object that RBAC can gate, and they integrate with external secret
@@ -849,7 +849,7 @@ kubectl create secret generic api-secrets \
 
 The `openssl rand -base64 64` command generates 64 random bytes (512 bits) and
 encodes them. This is far more entropy than HMAC-SHA256 needs (256 bits), but
-there's no harm in overspecifying — the key is stored once and the cost is zero
+there's no harm in overspecifying: the key is stored once and the cost is zero
 at runtime.
 
 ### Mount the Secret into the Deployment
@@ -884,7 +884,7 @@ spec:
 Two patterns are shown: `envFrom.secretRef` dumps all Secret keys as environment
 variables (useful when there are many). `env.valueFrom.secretKeyRef` maps a
 single Secret key to a named environment variable (more explicit). Use whichever
-your team prefers — the security properties are identical.
+your team prefers: the security properties are identical.
 
 ### Read the secret in Go
 
@@ -903,7 +903,7 @@ func main() {
 }
 ```
 
-A missing `JWT_SIGNING_KEY` fails fast at startup — no silent fallback to a
+A missing `JWT_SIGNING_KEY` fails fast at startup: no silent fallback to a
 hardcoded key that an attacker could guess.
 
 ### Rotate secrets
@@ -916,7 +916,7 @@ Secrets don't rotate themselves. The process:
    kubectl apply -f -`
 3. Update the Deployment to reference `jwt-signing-key-v2`.
 4. Roll out new Pods. Old Pods (with the old key) and new Pods (with the new key)
-   coexist during the rollout — tokens signed by either key are valid.
+   coexist during the rollout: tokens signed by either key are valid.
 5. After the rollout completes, remove the old key from the Secret.
 
 For zero-downtime rotation, `ValidateToken` should try the current key first,
@@ -976,18 +976,18 @@ with the new key. No logged-out users, no 401 spikes during deployment.
 
 You've now secured the Go API from the earlier tutorials with:
 
-- **JWT-based authentication** — `golang-jwt/jwt/v5` with HMAC-SHA256 signing,
+- **JWT-based authentication**: `golang-jwt/jwt/v5` with HMAC-SHA256 signing,
   15-minute token expiry, and a refresh token rotation pattern.
-- **Middleware** — `AuthMiddleware` extracts and validates `Authorization: Bearer`
+- **Middleware**: `AuthMiddleware` extracts and validates `Authorization: Bearer`
   tokens, injecting `Claims` into `context.Context`. `RequireRole` gates admin
   endpoints.
-- **Password hashing** — `bcrypt` with cost 12 for a local user store with
+- **Password hashing**: `bcrypt` with cost 12 for a local user store with
   registration and login endpoints.
-- **Role-based access control** — a `role` column on the `users` table, checked
+- **Role-based access control**: a `role` column on the `users` table, checked
   at the middleware level (role gating) and handler level (ownership checks).
-- **Testing** — unit tests for token operations and password hashing, integration
+- **Testing**: unit tests for token operations and password hashing, integration
   tests with `httptest` for the auth middleware and role enforcement.
-- **Kubernetes wiring** — JWT signing key stored in a Kubernetes Secret, mounted
+- **Kubernetes wiring**: JWT signing key stored in a Kubernetes Secret, mounted
   as an environment variable, with a two-key rotation strategy for zero-downtime
   key rollover.
 
@@ -999,22 +999,22 @@ automated CI/CD.
 
 Where the series could go next:
 
-- **Rate limiting** — add a token bucket rate limiter (per-user or per-IP) using
+- **Rate limiting**: add a token bucket rate limiter (per-user or per-IP) using
   `golang.org/x/time/rate`, wired as a chi middleware. Redis-backed for distributed
   deployments.
-- **gRPC services** — introduce the same API surface via gRPC with `protobuf`,
+- **gRPC services**: introduce the same API surface via gRPC with `protobuf`,
   interceptors for auth (analogous to HTTP middleware), and the trade-offs between
   REST + JSON and gRPC + protobuf.
-- **API versioning** — URL prefix versioning (`/api/v1/`, `/api/v2/`) and
+- **API versioning**: URL prefix versioning (`/api/v1/`, `/api/v2/`) and
   content-type negotiation as the API evolves while keeping backward compatibility.
-- **Caching** — Redis caching layer for expensive queries, cache invalidation
+- **Caching**: Redis caching layer for expensive queries, cache invalidation
   patterns (write-through, cache-aside), and TTL strategies.
-- **OAuth2 / OpenID Connect** — delegate authentication to an identity provider
+- **OAuth2 / OpenID Connect**: delegate authentication to an identity provider
   (Auth0, Keycloak, Google) so your Go API never touches passwords.
-- **API gateway** — place an API gateway (Kong, Envoy, Traefik) in front of the
+- **API gateway**: place an API gateway (Kong, Envoy, Traefik) in front of the
   service for centralized auth, rate limiting, and TLS termination.
 
 The auth patterns you added today are the hardest to retrofit. Adding auth to a
 running service means touching every handler, every test, and every deployment
-manifest. Getting it right from the start — while the API is still small —
+manifest. Getting it right from the start, while the API is still small,
 is the difference between a weekend of work and a quarter-long migration.

@@ -1,5 +1,5 @@
 /**
- * useLeader — global keyboard state machine (singleton)
+ * useLeader: global keyboard state machine (singleton)
  *
  * Shared across all client-side Vue islands. Models Neovim's leader-key flow:
  *   idle → press Space → leader active → press key → action / sub-map → dismiss

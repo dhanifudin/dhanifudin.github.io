@@ -1,6 +1,6 @@
 # Contributing to dhanifudin.github.io
 
-This site accepts contributions via GitHub Issues using the **OpenCode IssueOps** workflow —
+This site accepts contributions via GitHub Issues using the **OpenCode IssueOps** workflow,
 no local development setup required.
 
 ---
@@ -12,12 +12,12 @@ no local development setup required.
 Go to [Issues → New Issue](https://github.com/dhanifudin/dhanifudin.github.io/issues/new/choose)
 and choose a template:
 
-- **Bug Report** — something looks broken, a keybinding doesn't work, layout issues, etc.
-- **Content Request** — suggest a new blog post, project to add, or section to write
+- **Bug Report**: something looks broken, a keybinding doesn't work, layout issues, etc.
+- **Content Request**: suggest a new blog post, project to add, or section to write
 
 Be as specific as possible. The AI reads the full issue discussion, so detail matters.
 
-### 2. `/plan` — generate an implementation plan
+### 2. `/plan`: generate an implementation plan
 
 A repository collaborator (or the owner) will comment `/plan` on your issue. OpenCode reads
 the discussion and replies with a detailed implementation plan.
@@ -25,7 +25,7 @@ the discussion and replies with a detailed implementation plan.
 Review the plan. If something needs clarification or adjustment, add comments to the issue. The
 collaborator can re-run `/plan <feedback>` to refine it.
 
-### 3. `/build` — implement the plan
+### 3. `/build`: implement the plan
 
 Once the plan looks good, a collaborator comments `/build`. OpenCode:
 
@@ -46,7 +46,7 @@ Review the diff, leave comments, and request changes if needed. Collaborators ca
 ## Access control
 
 The `/plan` and `/build` commands are restricted to the repository **owner** (`dhanifudin`) only.
-Everyone else is welcome to open issues — the owner will review and trigger the commands.
+Everyone else is welcome to open issues; the owner will review and trigger the commands.
 
 ---
 
@@ -99,7 +99,7 @@ The site is at `http://localhost:4321` by default.
 
 Every Monday at ~08:00 WIB (01:00 UTC) the **Weekly Recommendation** workflow runs automatically.
 It builds the site, reads the existing issues and blog posts, then asks OpenCode to propose the
-single most valuable improvement — filed as a GitHub issue labelled `automated` plus either `bug`,
+single most valuable improvement, filed as a GitHub issue labelled `automated` plus either `bug`,
 `enhancement`, or `documentation`.
 
 The owner (or a collaborator) can then comment `/plan` on that issue to start implementation,

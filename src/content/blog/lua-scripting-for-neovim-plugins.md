@@ -1,5 +1,5 @@
 ---
-title: "Lua scripting for Neovim plugins — from init.lua to your first plugin"
+title: "Lua scripting for Neovim plugins: from init.lua to your first plugin"
 date: 2026-08-24
 description: "Stop editing other people's configs and start writing your own. Learn the Lua runtime primitives every plugin author needs, build a timestamp module from scratch, expose it as a user command and keymap, wire an autocommand, package it as a lazy.nvim plugin, and test it with plenary."
 tags: ["neovim", "lua", "lazyvim", "plugin-development", "developer-environment", "tutorial"]
@@ -14,7 +14,7 @@ draft: false
 ## Prerequisites
 
 This post picks up where [Neovim from scratch to LazyVim](/blog/neovim-from-scratch-to-lazyvim)
-left off. If you haven't read it, do that first — it walks through installing Neovim, the
+left off. If you haven't read it, do that first: it walks through installing Neovim, the
 `~/.config/nvim` layout, and the LazyVim distribution this tutorial assumes. Everything below
 works on a bare Neovim too, but the `lazy.nvim` section only makes sense once you have a plugin
 manager.
@@ -32,7 +32,7 @@ every axis:
   [LuaJIT](https://luajit.org). No interpreter to install, no version to manage.
 - **It's faster.** LuaJIT is a just-in-time compiler, often orders of magnitude faster than
   Vimscript's interpreter for the tight loops you find in a plugin's hot path.
-- **First-class tables.** Lua's single data structure — the table — maps perfectly onto config
+- **First-class tables.** Lua's single data structure, the table, maps perfectly onto config
   blobs, `opts` tables, and plugin specs. No `dict` vs `list` vs `object` distinctions.
 - **Full `vim.api` access.** Every internal Neovim function is exposed through the `vim.api`
   namespace, and Lua can call into *and* be called from Vimscript freely. You lose nothing by
@@ -49,8 +49,8 @@ source.
 
 ### `vim.api`
 
-The official, stable API for talking to Neovim. Anything a plugin does — create a buffer, set a
-keymap, register an autocmd — goes through here. The naming is consistent:
+The official, stable API for talking to Neovim. Anything a plugin does, create a buffer, set a
+keymap, register an autocmd, goes through here. The naming is consistent:
 `vim.api.nvim_<domain>_<verb>`.
 
 ```lua
@@ -169,7 +169,7 @@ Three things are happening:
 - `M.insert()` writes that string at the cursor. `vim.api.nvim_put` places text relative to the
   cursor line: the `"c"` is cursor-relative mode and the two `true`s mean *place after the
   cursor* and *advance the cursor*.
-- `return M` is non-negotiable — without it, `require()` gets `nil`.
+- `return M` is non-negotiable: without it, `require()` gets `nil`.
 
 Now load it from `init.lua`. You don't have to; this is just to prove the module resolves:
 
@@ -190,7 +190,7 @@ Open Neovim and run:
 
 A timestamp appears at your cursor. You just wrote and loaded your first Lua module.
 
-> **Tip:** if you get `module 'timestamp' not found`, check two things — the file lives under
+> **Tip:** if you get `module 'timestamp' not found`, check two things: the file lives under
 > `lua/` (not next to `init.lua`), and the filename minus `.lua` matches the `require` string.
 
 ## Exposing a user command and keymap
@@ -237,7 +237,7 @@ vim.keymap.set("n", "<leader>ut", "<cmd>InsertTimestamp<cr>", {
 })
 ```
 
-The `<cmd>` form runs the command in command-line mode without leaving normal mode — always
+The `<cmd>` form runs the command in command-line mode without leaving normal mode: always
 prefer it over `:`-style mappings for this. Press Space, then `u`, then `t` (LazyVim maps
 `<leader>` to Space). which-key shows your new entry, `desc` and all.
 
@@ -247,7 +247,7 @@ rung.
 
 ## Autocommands in Lua
 
-So far everything is pull-driven — you ask for it and it happens. Autocommands are the push side:
+So far everything is pull-driven: you ask for it and it happens. Autocommands are the push side:
 they fire when an *event* happens, like a file being saved or a buffer opening.
 
 The old way is a Vimscript string. Skip it:
@@ -257,7 +257,7 @@ The old way is a Vimscript string. Skip it:
 autocmd BufWritePre *.md :call SomeFunction()
 ```
 
-The Lua way uses `vim.api.nvim_create_autocmd` and — importantly — an **augroup** to keep your
+The Lua way uses `vim.api.nvim_create_autocmd` and, importantly, an **augroup** to keep your
 autocmds named and clearable. If you skip the group, re-sourcing your config stacks duplicate
 autocmds every time.
 
@@ -280,17 +280,17 @@ Breaking it down:
 - `nvim_create_augroup("timestamp", { clear = true })` creates (or clears) a group named
   `timestamp`. `clear = true` wipes any autocmds already in that group before adding more, so
   re-sourcing never duplicates them.
-- `pattern` is a glob matching the filename — `*.md` for Markdown, `*` for everything.
+- `pattern` is a glob matching the filename: `*.md` for Markdown, `*` for everything.
 - `callback` is your Lua function, called with an event table argument.
 
 This is a logging example; a more useful pattern replaces the placeholder text in a template, or
-formats code before a save. The shape — augroup + event + pattern + callback — is the same for
+formats code before a save. The shape, augroup + event + pattern + callback, is the same for
 every event. Run `:h autocmd-events` for the full list of what you can listen to.
 
 ## Loading a local plugin with lazy.nvim
 
 A config-side module is fine for *your* tweaks, but a plugin is something you'd want to reuse and
-share. lazy.nvim — the plugin manager under LazyVim — can load a plugin straight from a local
+share. lazy.nvim, the plugin manager under LazyVim, can load a plugin straight from a local
 directory, no GitHub required. This is the fastest way to develop a plugin before you publish it.
 
 Restructure your module into a standalone plugin directory with its own `lua/` tree:
@@ -303,7 +303,7 @@ Restructure your module into a standalone plugin directory with its own `lua/` t
 └── README.md
 ```
 
-Move `timestamp.lua` to `lua/timestamp/init.lua` (the module name `timestamp` still resolves —
+Move `timestamp.lua` to `lua/timestamp/init.lua` (the module name `timestamp` still resolves:
 a directory with `init.lua` works identically). Then point lazy.nvim at it:
 
 ```lua
@@ -361,7 +361,7 @@ return {
 }
 ```
 
-This `setup(opts)` convention is universal — it's how every plugin you install accepts config.
+This `setup(opts)` convention is universal: it's how every plugin you install accepts config.
 Write your own this way and your plugin will feel familiar to anyone who picks it up.
 
 ## Testing with plenary.nvim
@@ -401,7 +401,7 @@ nvim --headless -u tests/minimal_init.lua \
 ```
 
 The `describe`/`it`/`assert` API comes from busted; `assert.matches` checks the timestamp against
-a pattern (`YYYY-MM-DD`). Keep your pure logic — formatting, parsing, table shaping — in
+a pattern (`YYYY-MM-DD`). Keep your pure logic, formatting, parsing, table shaping, in
 functions like `format()`, and push the `vim.api` side effects into thin wrappers. That split is
 what makes the plugin testable without mocking the editor.
 
@@ -414,18 +414,18 @@ it.
   `{ "you/nvim-timestamp", opts = {} }`. LazyVim-style `setup(opts)` conventions, a `README`, and
   a passing test suite are what separate a real plugin from a gist.
 - **Contribute to LazyVim extras.** Browse `:LazyExtras` and read the source of one you use. The
-  extras are just Lua specs — the same shape you wrote above — and a well-scoped fix makes a great
+  extras are just Lua specs, the same shape you wrote above, and a well-scoped fix makes a great
   first contribution.
 - **Keep the series going.** The next logical stops are *terminal workflows: tmux, zsh, fzf* and
   *fuzzy-finding everything with fzf/telescope*, both of which build directly on the editor and
   scripting skills you have now.
 
-The pattern to remember isn't the timestamp — it's the shape: **module function → command →
+The pattern to remember isn't the timestamp: it's the shape: **module function → command →
 keymap**, wrapped in an augroup, packaged as a `setup(opts)` plugin, and pinned down by a test.
 Internalize that and you'll never look at someone else's Neovim config the same way again.
 
-- [Neovim Lua guide](https://neovim.io/doc/user/lua.html) — the canonical `:h lua` reference.
-- [lazy.nvim docs](https://lazy.folke.io) — plugin specs, `dir`, and local development.
-- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — the test harness used above.
-- [awesome-neovim](https://github.com/rockerBOO/awesome-neovim) — a thousand real-world Lua
+- [Neovim Lua guide](https://neovim.io/doc/user/lua.html): the canonical `:h lua` reference.
+- [lazy.nvim docs](https://lazy.folke.io): plugin specs, `dir`, and local development.
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim): the test harness used above.
+- [awesome-neovim](https://github.com/rockerBOO/awesome-neovim): a thousand real-world Lua
   plugins to read and learn from.

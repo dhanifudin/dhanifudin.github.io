@@ -1,6 +1,6 @@
 ---
 /**
- * EditorLayout.astro — Neovim/LazyVim editor chrome
+ * EditorLayout.astro: Neovim/LazyVim editor chrome
  *
  * Grid layout:
  *   ┌────────────────────────────┐
@@ -34,7 +34,7 @@ interface Props {
 
 const { title, description, ogImage, ogType } = Astro.props;
 const currentPath = Astro.url.pathname;
-const pageTitle   = title ? `${title} — ${profile.handle}` : profile.handle;
+const pageTitle   = title ? `${title} · ${profile.handle}` : profile.handle;
 const canonicalUrl = new URL(currentPath, Astro.site).href;
 const ogDescription = description || profile.tagline;
 const ogImageUrl = new URL(ogImage || '/og-image.png', Astro.site).href;
@@ -102,7 +102,7 @@ const projectMeta = allProjects
   </script>
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="alternate" type="application/rss+xml" title="Dian Hanifudin Subhi — Blog" href="/rss.xml" />
+  <link rel="alternate" type="application/rss+xml" title="Dian Hanifudin Subhi: Blog" href="/rss.xml" />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
   <!-- PWA -->

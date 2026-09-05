@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * WhichKey.vue — which-key.nvim popup
+ * WhichKey.vue: which-key.nvim popup
  *
  * Appears at the bottom when <leader> (Space) is pressed.
  * Shows grouped bindings; pressing a group key drills into its children.

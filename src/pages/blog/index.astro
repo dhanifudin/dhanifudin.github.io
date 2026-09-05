@@ -46,7 +46,7 @@ seriesList.forEach(s => s.posts.sort((a, b) => (a.data.series?.order ?? 0) - (b.
         <span>▤</span>
         <span>blog</span>
         <span style="color: var(--ctp-overlay0); font-size: 1rem; font-weight: 400;">
-          — {posts.length} posts
+          · {posts.length} posts
         </span>
       </h1>
 
@@ -67,7 +67,7 @@ seriesList.forEach(s => s.posts.sort((a, b) => (a.data.series?.order ?? 0) - (b.
             <span>⊞</span>
             <span>series</span>
             <span style="color: var(--ctp-overlay0); font-size: 0.85rem; font-weight: 400;">
-              — {seriesList.length} series
+              · {seriesList.length} series
             </span>
           </h2>
           {seriesList.map(series => (

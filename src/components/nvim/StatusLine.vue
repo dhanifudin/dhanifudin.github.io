@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * StatusLine.vue — lualine-style statusline
+ * StatusLine.vue: lualine-style statusline
  *
  * Left: mode pill → git branch → filename
  * Right: filetype → line/col → flavor → clock

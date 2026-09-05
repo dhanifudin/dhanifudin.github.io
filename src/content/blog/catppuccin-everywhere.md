@@ -1,7 +1,7 @@
 ---
 title: "Catppuccin: The colorscheme that follows me everywhere"
 date: 2026-03-10
-description: "From Neovim to the terminal to the browser — one palette to rule them all."
+description: "From Neovim to the terminal to the browser: one palette to rule them all."
 tags: ["catppuccin", "colorscheme", "design", "neovim"]
 draft: false
 ---
@@ -24,8 +24,8 @@ light to dark:
 ## Why it works on the web
 
 Catppuccin was designed for terminals and editors but the palette translates beautifully to UI.
-The semantic structure — `base`, `mantle`, `crust` for backgrounds; `surface0/1/2` for panels;
-`overlay0/1/2` for subdued text — maps directly to a design system.
+The semantic structure - `base`, `mantle`, `crust` for backgrounds; `surface0/1/2` for panels;
+`overlay0/1/2` for subdued text - maps directly to a design system.
 
 On this site, I use:
 - `base` → editor background
@@ -40,7 +40,7 @@ On this site, I use:
 
 ## The toggle
 
-This site ships Latte (light) as the default — better for daytime reading. Toggle to Mocha with
+This site ships Latte (light) as the default, better for daytime reading. Toggle to Mocha with
 `Space t` or the ◑ button in the status line. Your preference is stored in `localStorage`.
 
 ```typescript

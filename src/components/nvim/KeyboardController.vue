@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * KeyboardController — renderless Vue component
+ * KeyboardController: renderless Vue component
  *
  * Mounts a single global `keydown` listener that feeds the leader state
  * machine. Drop one instance into the EditorLayout; all other islands
@@ -29,7 +29,7 @@ function onKeyDown(e: KeyboardEvent) {
       openLeader();
     }
   } else {
-    // Leader is active — consume the keypress
+    // Leader is active, consume the keypress
     e.preventDefault();
     handleLeaderKey(e.key);
   }

@@ -1,5 +1,5 @@
 ---
-title: "Building REST APIs with Go — from net/http to structured handlers"
+title: "Building REST APIs with Go: from net/http to structured handlers"
 date: 2026-06-29
 description: "Build a complete REST API in Go: start with the standard library, add routing with chi, structure your JSON handlers, wire up CRUD with an in-memory store, layer on middleware, and test everything with table-driven tests."
 tags: ["go", "backend", "rest", "api"]
@@ -15,7 +15,7 @@ draft: false
 
 Go was designed at Google for the kind of networked services that power the internet.
 Its standard library ships with a production-grade HTTP server (`net/http`), a JSON
-encoder/decoder (`encoding/json`), and a testing framework (`testing`) — no framework
+encoder/decoder (`encoding/json`), and a testing framework (`testing`): no framework
 required. You can build and deploy an API with zero third-party dependencies.
 
 Beyond the stdlib, Go brings practical advantages for backend work:
@@ -31,7 +31,7 @@ Beyond the stdlib, Go brings practical advantages for backend work:
   fit for containers and serverless. The Docker post on this site shows how to package
   a Go API into an 8 MB scratch image.
 
-This tutorial walks you through building a complete REST API from scratch — starting with
+This tutorial walks you through building a complete REST API from scratch: starting with
 the standard library, then layering on routing, structured handlers, middleware, shutdown
 handling, and tests. By the end you'll have a reusable project template that you can
 containerise and deploy.
@@ -67,9 +67,9 @@ go-api-demo/
 `cmd/api/` holds the entrypoint. `internal/handlers/` contains HTTP handler functions.
 `internal/store/` is the data layer (in-memory for now). `internal/middleware/` holds
 cross-cutting concerns. The `internal` directory convention prevents other modules from
-importing these packages — they're private to your application.
+importing these packages: they're private to your application.
 
-For routing, we'll use [chi](https://github.com/go-chi/chi) — a lightweight, idiomatic
+For routing, we'll use [chi](https://github.com/go-chi/chi), a lightweight, idiomatic
 router that composes well with `net/http`:
 
 ```bash
@@ -126,7 +126,7 @@ matched any method and required manual checks.
 But `http.HandleFunc` hits walls quickly:
 
 - **No path parameters.** `/items/{id}` requires parsing the URL yourself.
-- **No middleware chaining.** Logging, auth, CORS — you'd wrap each handler manually.
+- **No middleware chaining.** Logging, auth, CORS: you'd wrap each handler manually.
 - **No route grouping.** Prefixes like `/api/v1/` mean repeated pattern strings.
 
 For a real API, these limitations add up. That's where `chi` comes in.
@@ -159,7 +159,7 @@ func main() {
         json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
     })
 
-    // Item routes — we'll implement these next
+    // Item routes - we'll implement these next
     s := store.NewMemory()
     h := handlers.NewItemHandler(s)
 
@@ -178,7 +178,7 @@ func main() {
 
 `r.Route("/items", ...)` scopes all child routes under that prefix. `{id}` captures a
 path segment into `chi.URLParam(r, "id")`. `r.Get`, `r.Post`, `r.Put`, `r.Delete` map
-directly to HTTP methods — no manual `r.Method` checks.
+directly to HTTP methods: no manual `r.Method` checks.
 
 ## Structured JSON handlers
 
@@ -484,7 +484,7 @@ func Logging(next http.Handler) http.Handler {
 
 Wrap the response writer to capture the status code (the standard `ResponseWriter` doesn't
 expose it after `WriteHeader`). The log line includes method, path, status, duration, and
-response size — everything you need to spot slow endpoints and error rates.
+response size: everything you need to spot slow endpoints and error rates.
 
 ### Recovery middleware
 
@@ -638,7 +638,7 @@ func main() {
 ```
 
 `signal.NotifyContext` creates a context that cancels on `SIGINT` (Ctrl+C) or `SIGTERM`.
-`srv.Shutdown` stops accepting new connections and waits for in-flight requests to finish —
+`srv.Shutdown` stops accepting new connections and waits for in-flight requests to finish,
 up to the 10-second deadline.
 
 Test it:
@@ -886,13 +886,13 @@ go test ./...
 
 ## Where to go next
 
-You now have a complete, testable REST API built with Go — ready to containerise and deploy.
+You now have a complete, testable REST API built with Go, ready to containerise and deploy.
 The natural next steps follow two paths:
 
 ### Containerise with Docker
 
 The [Docker primer](/blog/containers-and-docker) shows how to package this exact API into a
-multi-stage Docker image — compiling in an Alpine builder stage and copying the static binary
+multi-stage Docker image: compiling in an Alpine builder stage and copying the static binary
 into a `FROM scratch` runtime image. The result is an ~8 MB container that starts in
 milliseconds. The same post covers Docker Compose for local development, wiring the API to
 PostgreSQL and Redis.
@@ -902,8 +902,8 @@ PostgreSQL and Redis.
 The [Kubernetes for developers](/blog/kubernetes-for-developers) tutorial picks up where
 Docker leaves off. It walks through translating the Compose stack into Kubernetes Deployments
 and Services, adding readiness and liveness probes, extracting configuration into ConfigMaps
-and Secrets, and performing rolling updates with zero downtime. The entire stack — API,
-Postgres, Redis — runs on a local kind cluster.
+and Secrets, and performing rolling updates with zero downtime. The entire stack - API,
+Postgres, Redis - runs on a local kind cluster.
 
 ### Extend the API
 
@@ -911,13 +911,13 @@ Beyond the tutorial, here are directions worth exploring:
 
 - **Replace the in-memory store** with PostgreSQL via `database/sql` and `pgx`. Add migrations
   with [golang-migrate](https://github.com/golang-migrate/migrate).
-- **Add authentication** — JWT-based auth with middleware that extracts claims from
+- **Add authentication**: JWT-based auth with middleware that extracts claims from
   `Authorization: Bearer` headers and injects them into the request context.
-- **Structured logging** — swap `log.Printf` for [slog](https://pkg.go.dev/log/slog)
+- **Structured logging**: swap `log.Printf` for [slog](https://pkg.go.dev/log/slog)
   (Go 1.21+) with JSON output for log aggregation.
-- **API documentation** — generate OpenAPI specs from Go types and annotations using
+- **API documentation**: generate OpenAPI specs from Go types and annotations using
   [swaggo](https://github.com/swaggo/swag-go).
-- **More chi middleware** — `chi` ships with `Timeout`, `Throttle`, `RealIP`, and `Compress`
+- **More chi middleware**: `chi` ships with `Timeout`, `Throttle`, `RealIP`, and `Compress`
   middleware. Check the [chi docs](https://go-chi.io/) for the full list.
 
 The beauty of this stack is its simplicity. One binary, one module file, no generated code,

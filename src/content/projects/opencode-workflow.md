@@ -21,10 +21,10 @@ that lets the repository owner drive AI code generation via issue comments.
 
 ## Jobs
 
-- **check-auth** — verifies the commenter is the repository owner (`dhanifudin`)
-- **plan** — calls `opencode github run` to generate a plan comment
-- **build** — creates `opencode/issue-<N>` branch, implements, runs `npm run build`, opens PR
-- **report-error** — comments error details on failure
+- **check-auth**: verifies the commenter is the repository owner (`dhanifudin`)
+- **plan**: calls `opencode github run` to generate a plan comment
+- **build**: creates `opencode/issue-<N>` branch, implements, runs `npm run build`, opens PR
+- **report-error**: comments error details on failure
 
 ## Configuration
 

@@ -1,14 +1,14 @@
 ---
 title: "OpenCode IssueOps: AI-assisted contributions via GitHub Issues"
 date: 2026-02-20
-description: "How this site accepts contributions through /plan and /build commands — no code required."
+description: "How this site accepts contributions through /plan and /build commands: no code required."
 tags: ["opencode", "github-actions", "ai", "workflow"]
 draft: false
 ---
 
 ## The contributor workflow
 
-Most personal sites are closed systems — only the owner can change them. This one is different.
+Most personal sites are closed systems. Only the owner can change them. This one is different.
 Anyone can open a GitHub issue, describe what they want, and let an AI agent plan and implement it.
 
 The workflow is ported from [se-polinema/se-polinema.github.io](https://github.com/se-polinema/se-polinema.github.io),
@@ -20,8 +20,8 @@ adapted for a personal repo with collaborator-based access control.
 Go to [Issues → New Issue](https://github.com/dhanifudin/dhanifudin.github.io/issues/new/choose) and
 pick a template:
 
-- **Bug report** — something looks wrong or broken
-- **Content request** — suggest a new blog post topic, project to add, section to write
+- **Bug report**: something looks wrong or broken
+- **Content request**: suggest a new blog post topic, project to add, section to write
 
 Be specific. The AI reads the full issue discussion, so context is everything.
 
@@ -50,8 +50,8 @@ trigger them. This prevents spam while keeping contributions open.
 
 The workflow requires two GitHub secrets (set in repo Settings → Secrets):
 
-- `OPENCODE_GO_API_KEY` — your OpenCode API key
-- `GH_WORKFLOW_PAT` — a Personal Access Token with `repo` + `pull_requests` write
+- `OPENCODE_GO_API_KEY`: your OpenCode API key
+- `GH_WORKFLOW_PAT`: a Personal Access Token with `repo` + `pull_requests` write
 
 See [CONTRIBUTING.md](https://github.com/dhanifudin/dhanifudin.github.io/blob/main/CONTRIBUTING.md)
 for the full setup guide.
