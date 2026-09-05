@@ -1,5 +1,5 @@
 ---
-title: "gRPC services in Go — from protobuf to production"
+title: "gRPC services in Go: from protobuf to production"
 date: 2026-08-10
 description: "Build a gRPC service in Go: define a contract with Protocol Buffers, generate stubs with buf, implement unary and streaming RPCs, layer in interceptors and status codes, and deploy it behind a Kubernetes Service."
 tags: ["go", "backend", "grpc", "protobuf", "kubernetes", "microservices"]
@@ -15,7 +15,7 @@ draft: false
 
 In the [REST API tutorial](/blog/building-rest-apis-with-go) we built a JSON-over-HTTP
 API with `net/http` and `chi`. It is a great fit for browsers, mobile clients, and
-public endpoints — JSON is human-readable and works everywhere. But when one backend
+public endpoints: JSON is human-readable and works everywhere. But when one backend
 service calls another, that ubiquity starts to cost you:
 
 - **No contract.** REST endpoints are defined by convention. Nothing stops two teams
@@ -23,18 +23,18 @@ service calls another, that ubiquity starts to cost you:
 - **Text on the wire.** JSON is a text format. Every message pays for serialisation
   overhead, and you hand-parse fields with struct tags.
 - **Request/response only.** REST over HTTP/1.1 models one-shot calls. Streaming data
-  or long-lived connections means WebSockets or SSE — two more protocols to learn.
+  or long-lived connections means WebSockets or SSE: two more protocols to learn.
 
 gRPC is the de facto standard for service-to-service communication in cloud-native
 backends. It gives you four things that a hand-rolled REST API does not:
 
 - **Contract-first APIs.** You write a `.proto` schema and generate client and server
   code from it. The contract is a source file, reviewed in a PR, not a shared wiki page.
-- **Protocol Buffers on the wire.** A compact, binary serialisation format — smaller
+- **Protocol Buffers on the wire.** A compact, binary serialisation format, smaller
   and faster to encode/decode than JSON, with strict typing and backward-compatible
   schema evolution.
 - **HTTP/2 transport.** Multiplexed requests over a single connection, header
-  compression, and flow control — no six-connections-per-host limit.
+  compression, and flow control: no six-connections-per-host limit.
 - **Streaming built in.** Unary, server-streaming, client-streaming, and bidirectional
   streaming are first-class in the IDL, not bolted on.
 
@@ -146,7 +146,7 @@ Key design points:
   a field is free; renumbering it breaks every deployed client. Treat numbers as part of
   your public API.
 - **`proto3` is the default.** Every field has a zero value (`""`, `0`, `false`), so you
-  cannot distinguish "unset" from "empty" with a plain scalar — use `optional` or wrapper
+  cannot distinguish "unset" from "empty" with a plain scalar. Use `optional` or wrapper
   types when that matters.
 - **`go_package` pins the import path.** It is a full import path plus a package alias
   (`;itemsv1`). Omitting it makes `protoc` refuse to generate code for recent plugin
@@ -235,7 +235,7 @@ buf breaking --against '.git#branch=main'
 ```
 
 The generated code is not hand-edited. When the schema changes, regenerate and commit
-the result — clients and servers then evolve from a single source of truth.
+the result: clients and servers then evolve from a single source of truth.
 
 ## Implementing a unary service and client
 
@@ -305,7 +305,7 @@ func (s *Store) Create(name string, price float64) Item {
 }
 ```
 
-Now the service implementation. Note the `UnimplementedItemsServiceServer` embedding —
+Now the service implementation. Note the `UnimplementedItemsServiceServer` embedding:
 it is generated and provides default `Unimplemented` responses for every RPC, so adding
 a new method to the proto does not break existing servers:
 
@@ -374,7 +374,7 @@ Notice the mapping from REST to gRPC semantics:
 - `http.StatusBadRequest` → `codes.InvalidArgument`
 
 Error handling is covered in full below. For now, the key difference is that gRPC errors
-are typed, structured values carried in the trailing headers — not strings in a JSON body.
+are typed, structured values carried in the trailing headers, not strings in a JSON body.
 
 Wire the server up:
 
@@ -413,7 +413,7 @@ func main() {
 ```
 
 `reflection.Register(s)` exposes a server-reflection service that lets tools like
-`grpcurl` discover your methods without a shared `.proto` file — invaluable during
+`grpcurl` discover your methods without a shared `.proto` file, invaluable during
 development.
 
 ### A minimal client
@@ -454,7 +454,7 @@ func main() {
 ```
 
 `grpc.NewClient` is the modern constructor (gRPC-Go 1.63+); `grpc.Dial` is the legacy
-equivalent still seen in older code. Contexts and deadlines flow through every call —
+equivalent still seen in older code. Contexts and deadlines flow through every call:
 `context.WithTimeout` here bounds the entire RPC.
 
 Run the server and the client:
@@ -534,7 +534,7 @@ func AuthUnary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler
 }
 ```
 
-Unlike HTTP, gRPC has no notion of a path you can exclude from auth — every method goes
+Unlike HTTP, gRPC has no notion of a path you can exclude from auth: every method goes
 through the interceptor. If you need public methods (e.g. a health check), use a
 per-method skip list keyed by `info.FullMethod`, or rely on the separate health service.
 
@@ -637,7 +637,7 @@ s := grpc.NewServer(
 `grpc.ChainUnaryInterceptor` runs each interceptor in order, innermost first relative to
 the handler. Put auth early so unauthenticated calls are rejected before they are logged
 or counted as success. Note the auth interceptor above now blocks `grpcurl` unless you
-send a token — the verification commands below show how.
+send a token: the verification commands below show how.
 
 ## Streaming patterns
 
@@ -645,7 +645,7 @@ Streaming is where gRPC earns its keep over REST. Three shapes exist beyond plai
 
 ### Server-side streaming
 
-The server sends many responses for a single request — ideal for feeds, logs, or watch
+The server sends many responses for a single request, ideal for feeds, logs, or watch
 semantics. `WatchItems` emits matching items on an interval:
 
 ```go
@@ -686,7 +686,7 @@ void.
 
 ### Client-side streaming
 
-The client sends many requests and receives a single response — a batch upload:
+The client sends many requests and receives a single response, a batch upload:
 
 ```go
 func (s *Server) UploadItems(stream itemsv1.ItemsService_UploadItemsServer) error {
@@ -710,7 +710,7 @@ response and closes the stream.
 
 ### Bidirectional streaming
 
-Both sides send and receive independently, in any order — a two-way sync:
+Both sides send and receive independently, in any order, a two-way sync:
 
 ```go
 func (s *Server) SyncItems(stream itemsv1.ItemsService_SyncItemsServer) error {
@@ -757,12 +757,12 @@ Map REST codes to gRPC codes with `google.golang.org/grpc/codes`:
 Three gotchas:
 
 1. **Only return one code per RPC.** `status.Errorf` builds the whole response. Once you
-   return an error, the RPC is done — there is no "partially successful" response body.
+   return an error, the RPC is done. There is no "partially successful" response body.
 2. **Never leak internals.** `status.Errorf(codes.Internal, err.Error())` ships stack
    traces and file paths to clients. Log the detail server-side, send a generic message.
 3. **Prefer `codes.Unavailable` for retryable failures.** gRPC clients have built-in
    retry policies that key off `Unavailable`, `ResourceExhausted`, and
-   `Aborted` — returning the right code lets `grpc.WithDefaultServiceConfig` retry
+   `Aborted`, returning the right code lets `grpc.WithDefaultServiceConfig` retry
    transparently.
 
 The client-side check:
@@ -823,7 +823,7 @@ grpcurl -plaintext \
 # }
 ```
 
-Verify error handling — omitting the token returns a typed `Unauthenticated` error, and a
+Verify error handling: omitting the token returns a typed `Unauthenticated` error, and a
 missing ID returns `NotFound`:
 
 ```bash
@@ -853,7 +853,7 @@ grpcurl -plaintext \
 
 ### Tests without `grpcurl`
 
-For automated tests, the generated client can talk to a `bufconn` in-memory listener — no
+For automated tests, the generated client can talk to a `bufconn` in-memory listener, no
 real port needed:
 
 ```go
@@ -993,12 +993,12 @@ spec:
             periodSeconds: 10
 ```
 
-The `grpc-health-probe` binary is a single static executable you copy into the image —
+The `grpc-health-probe` binary is a single static executable you copy into the image,
 mirroring the multi-stage Docker build from the [Docker tutorial](/blog/containers-and-docker).
 
 ### Service
 
-A headless or ClusterIP Service is enough for internal traffic — gRPC does not need the
+A headless or ClusterIP Service is enough for internal traffic: gRPC does not need the
 HTTP routing an ingress provides for service-to-service calls:
 
 ```yaml
@@ -1048,7 +1048,7 @@ spec:
 ```
 
 The path matches the fully-qualified service name (`/items.v1.ItemsService`). Without
-TLS, gRPC clients cannot use the default secure transport — either terminate TLS at the
+TLS, gRPC clients cannot use the default secure transport: either terminate TLS at the
 ingress (the production answer) or use `grpc.WithTransportCredentials(insecure.NewCredentials())`
 for cluster-internal, non-ingress traffic. For east-west traffic inside the mesh, keep it
 simple: call the ClusterIP Service directly and leave TLS termination to a service mesh.
@@ -1058,17 +1058,17 @@ simple: call the ClusterIP Service directly and leave TLS termination to a servi
 You now have a contract-first gRPC service with unary and streaming RPCs, typed errors,
 interceptors, tests, and a Kubernetes-ready deployment. The natural next steps:
 
-- **Observability** — the [observability tutorial](/blog/observability-for-go-services)
+- **Observability**: the [observability tutorial](/blog/observability-for-go-services)
   covers OpenTelemetry and Prometheus. gRPC has first-class OTel instrumentation
   (`otelgrpc`) and the metrics interceptor above plugs directly into the same Prometheus
   endpoint you already expose.
-- **Service mesh** — for mTLS, traffic shifting, and retries across services, look at
+- **Service mesh**: for mTLS, traffic shifting, and retries across services, look at
   Istio or Linkerd. A mesh terminates TLS on your behalf and lets you drop the
   `insecure.NewCredentials()` from internal callers.
-- **gRPC-gateway** — if you need both gRPC and REST from one service, generate a REST
+- **gRPC-gateway**: if you need both gRPC and REST from one service, generate a REST
   proxy from the same `.proto` with [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
   Your browser clients get JSON while your internal clients keep the binary protocol.
-- **Schema registry** — publish your protos to the [Buf Schema Registry](https://buf.build)
+- **Schema registry**: publish your protos to the [Buf Schema Registry](https://buf.build)
   so teams consume versioned, linted, breaking-change-checked contracts instead of copying
   `.proto` files around.
 
@@ -1077,4 +1077,4 @@ observe → secure → contract-first services**. The REST API you started with 
 is one interface to the same domain; this tutorial adds a second, and the two coexist
 behind the same data layer. For internal, high-volume, machine-to-machine traffic, reach
 for gRPC; for browser-facing JSON APIs, keep the REST handler. The decision is not
-either/or — it is which interface fits each caller.
+either/or: it is which interface fits each caller.
