@@ -16,6 +16,7 @@
  */
 import { getCollection } from 'astro:content';
 import { pages, profile } from '../data/site';
+import { ogImagePath } from '../utils/og';
 import '../styles/global.css';
 import KeyboardController from '../components/nvim/KeyboardController.vue';
 import NeoTree           from '../components/nvim/NeoTree.vue';
@@ -37,7 +38,11 @@ const currentPath = Astro.url.pathname;
 const pageTitle   = title ? `${title} · ${profile.handle}` : profile.handle;
 const canonicalUrl = new URL(currentPath, Astro.site).href;
 const ogDescription = description || profile.tagline;
-const ogImageUrl = new URL(ogImage || '/og-image.png', Astro.site).href;
+const ogImageUrl = (() => {
+  if (ogImage) return new URL(ogImage, Astro.site).href;
+  const generated = ogImagePath(currentPath);
+  return new URL(generated ?? '/og-image.png', Astro.site).href;
+})();
 
 // Fetch collections for tree + palette
 const allPosts    = await getCollection('blog', ({ data }) => !data.draft).catch(() => []);
